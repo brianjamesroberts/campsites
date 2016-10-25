@@ -1,4 +1,4 @@
-package com.unfairtools.campsites.dagger.component;
+package com.unfairtools.campsites.dagger.module;
 
 /**
  * Created by newuser on 10/24/16.

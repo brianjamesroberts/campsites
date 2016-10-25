@@ -2,6 +2,8 @@ package com.unfairtools.campsites.dagger.component;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.unfairtools.campsites.dagger.module.SQLiteModule;
+
 import javax.inject.Singleton;
 
 import dagger.Component;
