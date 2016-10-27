@@ -2,17 +2,13 @@ package com.unfairtools.campsites.dagger.component;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.unfairtools.campsites.MainActivity;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
-
-import javax.inject.Singleton;
 
 import dagger.Component;
 
-/**
- * Created by newuser on 10/24/16.
- */
 
-
+import javax.inject.Singleton;
 
 @Component(modules = {
         SQLiteModule.class
@@ -20,6 +16,5 @@ import dagger.Component;
 
 @Singleton
 public interface ServicesComponent {
-
-    SQLiteDatabase sqlDatabase();
+    void inject(MainActivity fragment);
 }

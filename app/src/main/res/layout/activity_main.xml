@@ -22,4 +22,10 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 
+    <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:id="@+id/map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--class="com.google.android.gms.maps.SupportMapFragment" />-->
+
 </android.support.v4.widget.DrawerLayout>

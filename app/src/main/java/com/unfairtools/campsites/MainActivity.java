@@ -1,8 +1,13 @@
 package com.unfairtools.campsites;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,12 +18,64 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.dagger.component.DaggerServicesComponent;
+import com.unfairtools.campsites.ui.MapFragment;
+
+import java.net.URI;
+
+import javax.inject.Inject;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener,
+        OnMapReadyCallback{
+
+    public void onMapReady(GoogleMap gm){
+
+    }
+
+
+    public void onFragmentInteraction(Uri uri){
+
+    }
+
+    @Inject
+    SQLiteDatabase db;
+
+
+    public void putMapFragment(){
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment mapFragment = fm.findFragmentByTag("map_container");
+        if(mapFragment == null)
+            mapFragment = new MapFragment();
+        Bundle bundle = new Bundle();
+        mapFragment.setArguments(bundle);
+
+        fm.beginTransaction()
+                .replace(R.id.map_cointainer,mapFragment,"invites_fragment")
+                .addToBackStack("game_fragment").commit();
+        ((SupportMapFragment)mapFragment).getMapAsync(this);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ((BaseApplication)getApplication()).getServicesComponent().inject(this);
+
+        putMapFragment();
+
+//        SupportMapFragment mapFragment =
+//                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
+
+
+        Log.e("MainActivity", "DB is " + db.toString());
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
