@@ -1,21 +1,32 @@
 package com.unfairtools.campsites.ui;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.unfairtools.campsites.R;
+
+import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
+import com.unfairtools.campsites.dagger.module.MapsModule;
 import com.unfairtools.campsites.maps.MapsContract;
+import com.unfairtools.campsites.maps.MapsPresenter;
+
+import javax.inject.Inject;
 
 
 public class MapFragment extends SupportMapFragment implements MapsContract.View {
     // TODO: Rename parameter arguments, choose names that match
 
+
+    @Inject
+    MapsPresenter presenter;
+
+    @Inject
+    SQLiteDatabase db;
 
     private static String map_api_key = "AIzaSyC7wvENi9-UK9ateIMJ0xPleu_ZKqst7lU";
 
@@ -39,6 +50,16 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
+        DaggerMapsComponent.builder()
+                .mapsModule(new MapsModule(this,getContext()))
+                .build()
+                .inject(this);
+
+
+
+        presenter.log("eelo");
+        presenter.log("DB IS " + db.toString());
 
 
 

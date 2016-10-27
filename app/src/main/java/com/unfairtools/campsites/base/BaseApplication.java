@@ -2,6 +2,7 @@ package com.unfairtools.campsites.base;
 
 import android.app.Application;
 
+
 import com.unfairtools.campsites.dagger.component.DaggerServicesComponent;
 import com.unfairtools.campsites.dagger.component.ServicesComponent;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
