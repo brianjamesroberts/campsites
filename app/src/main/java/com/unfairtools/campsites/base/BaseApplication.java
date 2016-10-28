@@ -5,6 +5,7 @@ import android.app.Application;
 
 import com.unfairtools.campsites.dagger.component.DaggerServicesComponent;
 import com.unfairtools.campsites.dagger.component.ServicesComponent;
+import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
 
 
@@ -22,6 +23,7 @@ public class BaseApplication extends Application {
         servicesComponent =
                 DaggerServicesComponent.builder()
                 .sQLiteModule(new SQLiteModule(this))
+                .realmModule(new RealmModule(this))
                 .build();
     }
 

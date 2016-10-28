@@ -15,8 +15,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
 import com.unfairtools.campsites.dagger.module.MapsModule;
+import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.maps.MapsContract;
 import com.unfairtools.campsites.maps.MapsPresenter;
+import com.unfairtools.campsites.util.ApiService;
 
 import java.util.List;
 
@@ -32,6 +34,9 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 
     @Inject
     SQLiteDatabase db;
+
+//    @Inject
+//    ApiService apiService;
 
     private static String map_api_key = "AIzaSyC7wvENi9-UK9ateIMJ0xPleu_ZKqst7lU";
 
@@ -70,12 +75,16 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
         }
 
 
+
+
         DaggerMapsComponent.builder()
                 .mapsModule(new MapsModule(this,(BaseApplication)getActivity().getApplication()))
+                //.realmModule(new RealmModule((BaseApplication)getActivity().getApplication()))
                 .build()
                 .inject(this);
 
         presenter.log("fragment created");
+
 
 
 

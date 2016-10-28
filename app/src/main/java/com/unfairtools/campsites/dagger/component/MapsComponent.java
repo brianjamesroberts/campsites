@@ -1,6 +1,7 @@
 package com.unfairtools.campsites.dagger.component;
 
 import com.unfairtools.campsites.dagger.module.MapsModule;
+import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
 import com.unfairtools.campsites.ui.MapFragment;
 
