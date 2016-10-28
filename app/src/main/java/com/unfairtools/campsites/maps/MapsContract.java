@@ -1,5 +1,7 @@
 package com.unfairtools.campsites.maps;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.unfairtools.campsites.base.BasePresenter;
 import com.unfairtools.campsites.base.BaseView;
 
@@ -13,13 +15,19 @@ public interface MapsContract {
 
     interface View extends BaseView<Presenter> {
 
-        //void showCards(List<ScannedCode> codes);
+        void placePoints(List<Integer> points);
+
+        void zoomLocation(int x, int y, int zoom);
 
     }
 
     interface Presenter extends BasePresenter {
 
-        void loadCards();
+        void takeMap(GoogleMap gm);
+        void initZoom();
+        void initPoints();
+        void showInfo(SupportMapFragment mapFragment);
+
 
 //        void addNewCard(ScannedCode code);
 

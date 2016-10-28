@@ -25,15 +25,9 @@ public class BaseApplication extends Application {
                 .build();
     }
 
-
-
-
     public ServicesComponent getServicesComponent(){
         return servicesComponent;
     }
-
-
-
 
 
 }

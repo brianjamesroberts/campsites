@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.util.OpenHelper;
 
 import javax.inject.Singleton;
@@ -19,6 +20,7 @@ import dagger.Provides;
 public class SQLiteModule {
 
         private Context context;
+
 
         public SQLiteModule(Context c) {
             context = c;

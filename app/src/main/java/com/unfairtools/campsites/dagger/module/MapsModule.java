@@ -3,6 +3,7 @@ package com.unfairtools.campsites.dagger.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.maps.MapsContract;
 import com.unfairtools.campsites.maps.MapsPresenter;
 import com.unfairtools.campsites.util.OpenHelper;
@@ -22,19 +23,20 @@ public class MapsModule {
 
     private MapsContract.View view;
     private Context context;
+    private BaseApplication base;
 
-    public MapsModule(MapsContract.View v, Context c) {
+    public MapsModule(MapsContract.View v, BaseApplication b) {
         view = v;
-        context = c;
+        base = b;
     }
 
     @Provides
     MapsPresenter providePresenter() {
-        return new MapsPresenter(view);
+        return new MapsPresenter(view,base);
     }
 
     @Provides
     SQLiteDatabase provideDB(){
-        return OpenHelper.getInstance(context).getWritableDatabase();
+        return OpenHelper.getInstance(base.getApplicationContext()).getWritableDatabase();
     }
 }

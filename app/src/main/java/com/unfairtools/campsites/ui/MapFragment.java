@@ -8,12 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
 import com.unfairtools.campsites.dagger.module.MapsModule;
 import com.unfairtools.campsites.maps.MapsContract;
 import com.unfairtools.campsites.maps.MapsPresenter;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -34,6 +39,14 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 
     private OnFragmentInteractionListener mListener;
 
+    public void zoomLocation(int x, int y, int zoom){
+
+    }
+
+    public void placePoints(List<Integer> points){
+
+    }
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -45,21 +58,24 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 //        return fragment;
 //    }
 
+    public void setListeners(){
+        this.getMap().setBuildingsEnabled(true);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
         }
 
+
         DaggerMapsComponent.builder()
-                .mapsModule(new MapsModule(this,getContext()))
+                .mapsModule(new MapsModule(this,(BaseApplication)getActivity().getApplication()))
                 .build()
                 .inject(this);
 
-
-
-        presenter.log("eelo");
-        presenter.log("DB IS " + db.toString());
+        presenter.log("fragment created");
 
 
 
@@ -69,6 +85,14 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        OnMapReadyCallback cb = new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                presenter.takeMap(googleMap);
+            }
+        };
+        getMapAsync(cb);
 
         View viewMain = super.onCreateView(inflater, container, savedInstanceState);
 

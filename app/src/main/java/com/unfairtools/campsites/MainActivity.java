@@ -23,18 +23,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.ui.MapFragment;
+import com.unfairtools.campsites.util.SQLMethods;
 
 import java.net.URI;
 
 import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener,
-        OnMapReadyCallback{
-
-    public void onMapReady(GoogleMap gm){
-
-    }
+        implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener
+        {
 
 
     public void onFragmentInteraction(Uri uri){
@@ -56,7 +53,56 @@ public class MainActivity extends AppCompatActivity
         fm.beginTransaction()
                 .replace(R.id.map_cointainer,mapFragment,"invites_fragment")
                 .addToBackStack("game_fragment").commit();
-        ((SupportMapFragment)mapFragment).getMapAsync(this);
+    }
+
+    public void initDatabaseCheck(){
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_TABLE_NAME)){
+            Log.e("MainActivity","Creating table " + SQLMethods.Constants.LOCATIONS_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                    SQLMethods.Constants.LOCATIONS_TABLE_NAME +
+                    "("
+                            +  SQLMethods.Constants.LocationsTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                            +  SQLMethods.Constants.LocationsTable.latitude +" REAL,"
+                            +  SQLMethods.Constants.LocationsTable.longitude +" REAL,"
+                            +  SQLMethods.Constants.LocationsTable.name + " VARCHAR,"
+                            +  SQLMethods.Constants.LocationsTable.type+" INTEGER"
+                            +");");
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME)){
+            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                    SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME +
+                    "("
+                            + SQLMethods.Constants.MapPreferencesTable.latitude + " REAL,"
+                            + SQLMethods.Constants.MapPreferencesTable.longitude + " REAL,"
+                            +SQLMethods.Constants.MapPreferencesTable.zoom + " REAL"
+                            + ");");
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME)){
+            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME +
+                            "("
+                    + SQLMethods.Constants.LocationsInfoTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                    + SQLMethods.Constants.LocationsInfoTable.description + " VARCHAR,"
+                    + SQLMethods.Constants.LocationsInfoTable.imagesurl + " VARCHAR,"
+                    + SQLMethods.Constants.LocationsInfoTable.cached_rating + " REAL,"
+                    + SQLMethods.Constants.LocationsInfoTable.cached_comments + " VARCHAR"
+                    +");"
+            );
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
 
@@ -66,14 +112,9 @@ public class MainActivity extends AppCompatActivity
 
         ((BaseApplication)getApplication()).getServicesComponent().inject(this);
 
+        initDatabaseCheck();
+
         putMapFragment();
-
-//        SupportMapFragment mapFragment =
-//                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-
-
-        Log.e("MainActivity", "DB is " + db.toString());
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
