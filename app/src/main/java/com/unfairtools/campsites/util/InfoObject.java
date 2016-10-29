@@ -11,12 +11,13 @@ public class InfoObject {
     public double latSouth;
     public double longWest;
     public double longEast;
-    public double latPoint;
-    public double longPoint;
+    public float latPoint;
+    public float longPoint;
 
-    public String[] ids;
+    public int[] ids;
     public double[] latitudes;
     public double[] longitudes;
     public String[] names;
-    public String[] types;
+    public int[] types;
+
 }

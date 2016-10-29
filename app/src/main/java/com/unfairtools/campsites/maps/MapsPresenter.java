@@ -13,12 +13,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.util.ApiService;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.SQLMethods;
 
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by brianroberts on 10/26/16.
@@ -53,6 +55,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public boolean onMarkerClick(Marker m){
 
+        m.showInfoWindow();
         log("Marker clicked id "  +  m.getId() + ", snippet: " + m.getSnippet());
         return true;
 
@@ -72,8 +75,17 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     @Override
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
                         try {
+
+                            Gson gson = new Gson();
+                            String json = gson.toJson(response.body());
+                            System.out.println(json);
+
                             if(response.isSuccessful()) {
-                                placeMarkersOnMap(googleMap, response.body());
+                                InfoObject inf = response.body();
+                                System.out.println(inf.names);
+                                if(response.body().names!=null) {
+                                    placeMarkersOnMap(googleMap, response.body());
+                                }
                             }
 //                    readTSLInfo(new JSONObject(response.body().toJSon()));
                         }catch (Exception e){
@@ -93,7 +105,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     public static void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf){
         for(int i = 0; i < inf.ids.length; i++) {
             googleMap.addMarker(new MarkerOptions()
-                    .snippet(inf.ids[i])
+                    .snippet(inf.ids[i]+ "")
             .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
             .title(inf.names[i]));
         }
@@ -115,15 +127,15 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
             @Override
             public void onCameraChange(CameraPosition location) {
 
-                db.beginTransaction();
-                ArrayList<MarkerOptions> markers = SQLMethods.getMarkers(db, googleMap.getProjection().getVisibleRegion().latLngBounds);
-                db.setTransactionSuccessful();
-                db.endTransaction();
+//                db.beginTransaction();
+//                ArrayList<MarkerOptions> markers = SQLMethods.getMarkers(db, googleMap.getProjection().getVisibleRegion().latLngBounds);
+//                db.setTransactionSuccessful();
+//                db.endTransaction();
                 googleMap.clear();
-                Log.e("Presenter","MarkerOptions is size " + markers.size());
-                for(MarkerOptions marker: markers){
-                    googleMap.addMarker(marker);
-                }
+//                Log.e("Presenter","MarkerOptions is size " + markers.size());
+//                for(MarkerOptions marker: markers){
+//                    googleMap.addMarker(marker);
+//                }
                 loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
 
                 //log(location.zoom+ ": lat; " + location.target.latitude + " long; " + location.target.longitude);
