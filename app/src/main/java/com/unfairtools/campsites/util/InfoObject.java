@@ -7,16 +7,16 @@ package com.unfairtools.campsites.util;
 public class InfoObject {
 
     public String name;
-    public float latNorth;
-    public float latSouth;
-    public float longWest;
-    public float longEast;
-    public float latPoint;
-    public float longPoint;
+    public double latNorth;
+    public double latSouth;
+    public double longWest;
+    public double longEast;
+    public double latPoint;
+    public double longPoint;
 
     public String[] ids;
-    public String[] latitudes;
-    public String[] longitudes;
+    public double[] latitudes;
+    public double[] longitudes;
     public String[] names;
     public String[] types;
 }

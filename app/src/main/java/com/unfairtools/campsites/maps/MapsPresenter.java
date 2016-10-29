@@ -59,48 +59,22 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     }
 
 
-    public void loadMarkers(){
+    public void loadMarkers(final LatLngBounds latLngBounds){
         new Thread(){
             public void run(){
-
                 InfoObject inf = new InfoObject();
-                inf.name="Hello";
-
+                inf.latNorth = latLngBounds.northeast.latitude;
+                inf.longEast = latLngBounds.northeast.longitude;
+                inf.latSouth = latLngBounds.southwest.latitude;
+                inf.longWest = latLngBounds.southwest.longitude;
                 Call<InfoObject> call = apiService.postBoundsForMarkers(inf);
-
- //               Call<InfoObject> call = apiService.postLogin("brian","password1");
-
-//                Call<InfoObject> call = apiService.postBoundsForMarkers("{\n" +
-//                        "  \"array\": [\n" +
-//                        "    1,\n" +
-//                        "    2,\n" +
-//                        "    3\n" +
-//                        "  ],\n" +
-//                        "  \"boolean\": true,\n" +
-//                        "  \"null\": null,\n" +
-//                        "  \"number\": 123,\n" +
-//                        "  \"object\": {\n" +
-//                        "    \"a\": \"b\",\n" +
-//                        "    \"c\": \"d\",\n" +
-//                        "    \"e\": \"f\"\n" +
-//                        "  },\n" +
-//                        "  \"string\": \"Hello World\"\n" +
-//                        "}");
-
-                //Log.e("call","URL of call is " + call.request().url());
-
                 call.enqueue(new Callback<InfoObject>(){
-
                     @Override
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
                         try {
-
-
-
-                            Log.e("IsSuccessful",response.isSuccessful() + "");
-                            Log.e("Recvd", response.body().name);
-                            Log.e("name",response.raw().toString());
-                            //Log.e("Recvd", new JSONObject(response.body().toJSon()).toString());
+                            if(response.isSuccessful()) {
+                                placeMarkersOnMap(googleMap, response.body());
+                            }
 //                    readTSLInfo(new JSONObject(response.body().toJSon()));
                         }catch (Exception e){
                             e.printStackTrace();
@@ -113,6 +87,16 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 });
             }
         }.start();
+    }
+
+
+    public static void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf){
+        for(int i = 0; i < inf.ids.length; i++) {
+            googleMap.addMarker(new MarkerOptions()
+                    .snippet(inf.ids[i])
+            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
+            .title(inf.names[i]));
+        }
     }
 
     public void takeMap(GoogleMap gm){
@@ -140,12 +124,11 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 for(MarkerOptions marker: markers){
                     googleMap.addMarker(marker);
                 }
+                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
 
                 //log(location.zoom+ ": lat; " + location.target.latitude + " long; " + location.target.longitude);
             }
         });
-
-        loadMarkers();
     }
 
 
