@@ -14,6 +14,37 @@
     tools:showIn="@layout/app_bar_main">
     <FrameLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map_cointainer"></FrameLayout>
+        android:id="@+id/map_cointainer">
+
+
+    </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:background="#c8fafafa">
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/search_bar">
+                <android.support.v7.widget.Toolbar
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/custom_toolbar">
+                </android.support.v7.widget.Toolbar>
+
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+        </FrameLayout>
+
+    </FrameLayout>
 </RelativeLayout>

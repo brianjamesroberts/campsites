@@ -1,13 +1,17 @@
 package com.unfairtools.campsites;
 
+import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +21,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,8 +51,10 @@ public class MainActivity extends AppCompatActivity
     public void putMapFragment(){
         FragmentManager fm = getSupportFragmentManager();
         Fragment mapFragment = fm.findFragmentByTag("map_container");
-        if(mapFragment == null)
+        if(mapFragment == null) {
             mapFragment = new MapFragment();
+            Log.e("gg","Map fragment was null");
+        }
         Bundle bundle = new Bundle();
         mapFragment.setArguments(bundle);
 
@@ -106,6 +114,15 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+
+            @Override
+            public boolean onPrepareOptionsMenu(Menu menu){
+                for(int i = 0; i < menu.size(); i++){
+                    menu.getItem(i).setVisible(false);
+                }
+                return true;
+            }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,10 +134,19 @@ public class MainActivity extends AppCompatActivity
         putMapFragment();
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.custom_toolbar);
+
+        LayoutInflater mInflater= LayoutInflater.from(this);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_searchfield, null);
+        toolbar.addView(mCustomView);
+
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,6 +156,47 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
+        //ImageButton hamburgerButton = (ImageButton)findViewById(R.id.hamburger_button);
+
+//DrawerArrowDrawable dad = new DrawerArrowDrawable(this);
+  //     dad.
+//        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawer,
+//                dad, R.string.drawer_open,
+//                R.string.drawer_close);
+
+
+//        e(Activity activity, Toolbar toolbar, DrawerLayout drawerLayout,
+//                DrawerArrowDrawable slider, @StringRes int openDrawerContentDescRes,
+//        @StringRes int closeDrawerContentDescRes)
+
+        //ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,null,drawer,dad,R.string.drawer_open,R.string.drawer_close);
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawer,
+                null, R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                Log.e("Drawer","Drawer closed");
+                //getActionBar().setTitle();
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                Log.e("Drawer","Drawer opened");
+                //getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        drawer.setDrawerListener(mDrawerToggle);
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
