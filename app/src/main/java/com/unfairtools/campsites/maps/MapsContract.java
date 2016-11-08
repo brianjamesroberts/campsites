@@ -1,5 +1,9 @@
 package com.unfairtools.campsites.maps;
 
+
+
+import android.app.FragmentManager;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.unfairtools.campsites.base.BasePresenter;
@@ -19,9 +23,11 @@ public interface MapsContract {
 
         void zoomLocation(int x, int y, int zoom);
 
+        FragmentManager getFragmentManager2();
     }
 
     interface Presenter extends BasePresenter {
+
 
         void takeMap(GoogleMap gm);
         void initZoom();

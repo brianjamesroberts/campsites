@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CampSites</string>
 
-    <string name = "google_maps_key">AIzaSyC7wvENi9-UK9ateIMJ0xPleu_ZKqst7lU</string>
+    <string name="google_maps_key">AIzaSyC7wvENi9-UK9ateIMJ0xPleu_ZKqst7lU</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

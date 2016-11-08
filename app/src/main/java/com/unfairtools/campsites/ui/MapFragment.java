@@ -1,9 +1,11 @@
 package com.unfairtools.campsites.ui;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+//import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +46,11 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 
     private OnFragmentInteractionListener mListener;
 
+
+    public FragmentManager getFragmentManager2(){
+        return getActivity().getFragmentManager();
+
+    }
     public void zoomLocation(int x, int y, int zoom){
 
     }
@@ -63,9 +70,9 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 //        return fragment;
 //    }
 
-    public void setListeners(){
-        this.getMap().setBuildingsEnabled(true);
-    }
+//    public void setListeners(){
+//        this.getMap().setBuildingsEnabled(true);
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.ui.MapFragment;
+import com.unfairtools.campsites.ui.ShowMarkerDetailsDialogFragment;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import java.net.URI;
@@ -36,7 +37,8 @@ import java.net.URI;
 import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener
+        implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener,
+        ShowMarkerDetailsDialogFragment.OnFragmentInteractionListener
         {
 
 

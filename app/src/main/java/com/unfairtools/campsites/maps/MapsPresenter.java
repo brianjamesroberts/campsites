@@ -3,6 +3,7 @@ package com.unfairtools.campsites.maps;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -16,12 +17,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.ui.MapFragment;
+import com.unfairtools.campsites.ui.ShowMarkerDetailsDialogFragment;
 import com.unfairtools.campsites.util.ApiService;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.SQLMethods;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -53,13 +58,23 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     };
 
+    private HashMap<Marker, Integer> markerHashMap;
+
     public boolean onMarkerClick(Marker m){
 
         m.showInfoWindow();
-        log("Marker clicked id "  +  m.getId() + ", snippet: " + m.getSnippet());
+        log("Marker clicked id "  +  m.getId() + ", id: " + markerHashMap.get(m));
+        ShowMarkerDetailsDialogFragment f = new ShowMarkerDetailsDialogFragment();
+
+        //f.show(view.getFragmentManager(),"");
+
+
+        f.show(view.getFragmentManager2(),"dialog1");
         return true;
 
     }
+
+
 
 
     public void loadMarkers(final LatLngBounds latLngBounds){
@@ -84,7 +99,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                                 InfoObject inf = response.body();
                                 System.out.println(inf.names);
                                 if(response.body().names!=null) {
-                                    placeMarkersOnMap(googleMap, response.body());
+                                    placeMarkersOnMap(googleMap, response.body(), markerHashMap);
                                 }
                             }
 //                    readTSLInfo(new JSONObject(response.body().toJSon()));
@@ -102,12 +117,21 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     }
 
 
-    public static void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf){
+    public static void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf, HashMap<Marker,Integer> hashMap){
         for(int i = 0; i < inf.ids.length; i++) {
-            googleMap.addMarker(new MarkerOptions()
-                    .snippet(inf.ids[i]+ "")
-            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
-            .title(inf.names[i]));
+
+            hashMap.put(
+                    googleMap.addMarker(new MarkerOptions()
+                            //.snippet(inf.ids[i]+ "")
+                            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
+                            .title(inf.names[i]))
+                    ,inf.ids[i]);
+
+//            googleMap.addMarker(new MarkerOptions()
+//                    //.snippet(inf.ids[i]+ "")
+//            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
+//            .title(inf.names[i]));
+
         }
     }
 
@@ -161,8 +185,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void init(){
 
-        db.beginTransaction();
-        db.endTransaction();
+        markerHashMap = new HashMap<Marker,Integer>();
 
     }
 
