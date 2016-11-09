@@ -74,16 +74,10 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     private HashMap<Marker, Integer> markerHashMap;
 
     public boolean onMarkerClick(Marker m){
-
         m.showInfoWindow();
         log("Marker clicked id "  +  m.getId() + ", id: " + markerHashMap.get(m));
-
         ShowMarkerDetailsDialogFragment f;//= (ShowMarkerDetailsDialogFragment)view.getFragmentManager2().findFragmentByTag("dialog1");
-
-            f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
-
-
-
+        f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
         f.show(view.getFragmentManager2(),"dialog1");
         return true;
 
@@ -181,9 +175,9 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         for(MarkerOptions m: iMarkers){
             markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMap.get(m));
         }
-
-
     }
+
+
 
     public void takeMap(GoogleMap gm){
         googleMap = gm;

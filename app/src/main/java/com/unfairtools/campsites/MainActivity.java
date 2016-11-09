@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     SQLiteDatabase db;
 
 
+
     public void putMapFragment(){
         FragmentManager fm = getSupportFragmentManager();
         Fragment mapFragment = fm.findFragmentByTag("map_container");
