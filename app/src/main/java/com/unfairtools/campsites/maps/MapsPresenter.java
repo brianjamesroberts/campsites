@@ -144,7 +144,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     }
                     @Override
                     public void onFailure(Call<InfoObject> call, Throwable t) {
-                        Log.e("resp","failed " + t.toString());
+
+                        Log.e("resp","failed " + t.toString() + " is executed: " + call.isExecuted());
                     }
                 });
             }
@@ -162,7 +163,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
                     .title(inf.names[i]);
 
-            if(!markerOptionsHashMapLocal.containsKey(mo)) {
+            if(!markerOptionsHashMapLocal.containsValue(inf.ids[i])) {
                 markerOptionsHashMap.put(mo, inf.ids[i]);
                 Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
             }else {
@@ -190,7 +191,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         googleMap.setOnMarkerClickListener(this);
 
         db.beginTransaction();
-        SQLMethods.addLocation(db,0,48.0356029f,-123.424074f,"Heart O' the Hills Campground",0);
+        SQLMethods.addLocation(db,0,48.0356029f,-123.424074f,"Heart O the Hills Campground",0);
         SQLMethods.addLocationInfo(db,0,"The beautiful Heart O' the Hills Campground","",4.5f,"I hate this place\n");
         db.setTransactionSuccessful();
         db.endTransaction();
