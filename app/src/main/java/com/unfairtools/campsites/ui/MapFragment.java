@@ -16,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
+import com.unfairtools.campsites.dagger.component.DaggerMarkerInfoFragmentComponent;
 import com.unfairtools.campsites.dagger.module.MapsModule;
 import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.maps.MapsContract;
@@ -80,7 +81,6 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
         setRetainInstance(true);
         if (getArguments() != null) {
         }
-
 
 
 

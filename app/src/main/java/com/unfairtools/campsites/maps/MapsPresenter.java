@@ -26,6 +26,7 @@ import com.unfairtools.campsites.util.SQLMethods;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -54,19 +55,33 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     private GoogleMap googleMap;
 
+
+    public MapsPresenter(MapsContract.View v, BaseApplication b){
+        view = v;
+        baseApp = b;
+        b.getServicesComponent().inject(this);
+        init();
+        log("presenter created");
+    }
+
     public void initZoom(){
 
     };
 
+
+    private HashMap<MarkerOptions, Integer> markerOptionsHashMap;
+    private HashMap<MarkerOptions, Integer> markerOptionsHashMapLocal;
     private HashMap<Marker, Integer> markerHashMap;
 
     public boolean onMarkerClick(Marker m){
 
         m.showInfoWindow();
         log("Marker clicked id "  +  m.getId() + ", id: " + markerHashMap.get(m));
-        ShowMarkerDetailsDialogFragment f = new ShowMarkerDetailsDialogFragment();
 
-        //f.show(view.getFragmentManager(),"");
+        ShowMarkerDetailsDialogFragment f;//= (ShowMarkerDetailsDialogFragment)view.getFragmentManager2().findFragmentByTag("dialog1");
+
+            f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
+
 
 
         f.show(view.getFragmentManager2(),"dialog1");
@@ -76,8 +91,27 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
 
 
+    public void loadMarkersLocal(final LatLngBounds latLngBounds){
+
+        ArrayList<SQLMethods.MarkerOptionsSpec> localSaves = SQLMethods.getMarkers(db,latLngBounds);
+
+        markerOptionsHashMapLocal.clear();
+
+        Log.e("MapsPresenter", localSaves.size() + " localsaves");
+
+        for(SQLMethods.MarkerOptionsSpec mo: localSaves){
+            Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
+            markerOptionsHashMapLocal.put(mo.marker,mo.id);
+        }
+
+
+    }
+
 
     public void loadMarkers(final LatLngBounds latLngBounds){
+
+
+
         new Thread(){
             public void run(){
                 InfoObject inf = new InfoObject();
@@ -99,7 +133,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                                 InfoObject inf = response.body();
                                 System.out.println(inf.names);
                                 if(response.body().names!=null) {
-                                    placeMarkersOnMap(googleMap, response.body(), markerHashMap);
+                                    loadMarkersLocal(latLngBounds);
+                                    placeMarkersOnMap(googleMap, response.body());
                                 }
                             }
 //                    readTSLInfo(new JSONObject(response.body().toJSon()));
@@ -117,22 +152,36 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     }
 
 
-    public static void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf, HashMap<Marker,Integer> hashMap){
-        for(int i = 0; i < inf.ids.length; i++) {
+    public void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf){
 
-            hashMap.put(
-                    googleMap.addMarker(new MarkerOptions()
-                            //.snippet(inf.ids[i]+ "")
-                            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
-                            .title(inf.names[i]))
-                    ,inf.ids[i]);
+        markerOptionsHashMap.clear();
 
-//            googleMap.addMarker(new MarkerOptions()
-//                    //.snippet(inf.ids[i]+ "")
-//            .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
-//            .title(inf.names[i]));
 
+        for(int i = 0; i < inf.ids.length; i++){
+            MarkerOptions mo = new MarkerOptions()
+                    .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
+                    .title(inf.names[i]);
+
+            if(!markerOptionsHashMapLocal.containsKey(mo)) {
+                markerOptionsHashMap.put(mo, inf.ids[i]);
+                Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
+            }else {
+                Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
+            }
         }
+
+        Set<MarkerOptions> localMarkers =  markerOptionsHashMapLocal.keySet();
+        Set<MarkerOptions> iMarkers = markerOptionsHashMap.keySet();
+
+        for(MarkerOptions m : localMarkers){
+            markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMapLocal.get(m));
+        }
+
+        for(MarkerOptions m: iMarkers){
+            markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMap.get(m));
+        }
+
+
     }
 
     public void takeMap(GoogleMap gm){
@@ -151,18 +200,14 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
             @Override
             public void onCameraChange(CameraPosition location) {
 
-//                db.beginTransaction();
-//                ArrayList<MarkerOptions> markers = SQLMethods.getMarkers(db, googleMap.getProjection().getVisibleRegion().latLngBounds);
-//                db.setTransactionSuccessful();
-//                db.endTransaction();
-                googleMap.clear();
-//                Log.e("Presenter","MarkerOptions is size " + markers.size());
-//                for(MarkerOptions marker: markers){
-//                    googleMap.addMarker(marker);
-//                }
-                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
 
-                //log(location.zoom+ ": lat; " + location.target.latitude + " long; " + location.target.longitude);
+                markerHashMap.clear();
+
+
+                googleMap.clear();
+
+
+                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
             }
         });
     }
@@ -175,17 +220,13 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         //mapFragment.getActivity().makeDialog()
     };
 
-    public MapsPresenter(MapsContract.View v, BaseApplication b){
-        view = v;
-        baseApp = b;
-        b.getServicesComponent().inject(this);
-        init();
-        log("presenter created");
-    }
+
 
     public void init(){
 
         markerHashMap = new HashMap<Marker,Integer>();
+        markerOptionsHashMap = new HashMap<MarkerOptions, Integer>();
+        markerOptionsHashMapLocal = new HashMap<MarkerOptions, Integer>();
 
     }
 

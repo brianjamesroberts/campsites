@@ -16,8 +16,14 @@ import java.util.ArrayList;
 public class SQLMethods {
 
 
-    public static ArrayList<MarkerOptions>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
-        ArrayList<MarkerOptions> returnMarkers = new ArrayList<MarkerOptions>();
+    public static class MarkerOptionsSpec{
+        public MarkerOptions marker;
+        public Integer id;
+
+    }
+
+    public static ArrayList<SQLMethods.MarkerOptionsSpec>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
+        ArrayList<SQLMethods.MarkerOptionsSpec> returnMarkers = new ArrayList<SQLMethods.MarkerOptionsSpec>();
 
         Log.e("SQLMETHODS", "latLngBounds.southewest: " + latLngBounds.southwest.toString());
 
@@ -38,10 +44,15 @@ public class SQLMethods {
             if (i == 0)
                 resultSet.moveToFirst();
 
+            Integer mInt = resultSet.getInt(0);
             LatLng latLng = new LatLng(resultSet.getFloat(1), resultSet.getFloat(2));
             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(resultSet.getString(3))
-                    .snippet(resultSet.getInt(0)+"");
-            returnMarkers.add(markerOptions);
+//                    .snippet(resultSet.getInt(0)+"")
+;
+            MarkerOptionsSpec mSpec = new MarkerOptionsSpec();
+            mSpec.marker = markerOptions;
+            mSpec.id = mInt;
+            returnMarkers.add(mSpec);
             resultSet.moveToNext();
         }
 
