@@ -61,11 +61,11 @@ public class SQLMethods {
             resultSet.moveToFirst();
 
             retFloat = resultSet.getFloat(3);
+            resultSet.close();
             db.setTransactionSuccessful();
         }catch(Exception e){
             e.printStackTrace();
         }finally{
-            resultSet.close();
             db.endTransaction();
             return retFloat;
         }
@@ -78,7 +78,6 @@ public class SQLMethods {
         db.beginTransaction();
         try{
 
-
             resultSet = db.rawQuery("Select * from " + Constants.MAP_PREFERENCES_TABLE_NAME + " WHERE " +
                     Constants.MapPreferencesTable.id_primary_key + " = 0;", null);
             if(resultSet==null)
@@ -87,12 +86,12 @@ public class SQLMethods {
                 return retLatLng;
             resultSet.moveToFirst();
             retLatLng = new LatLng(resultSet.getDouble(1),resultSet.getDouble(2));
+            resultSet.close();
             db.setTransactionSuccessful();
         }catch(Exception e){
             e.printStackTrace();
 
         }finally{
-            resultSet.close();
             db.endTransaction();
             return retLatLng;
         }
@@ -123,9 +122,7 @@ public class SQLMethods {
 
             Integer mInt = resultSet.getInt(0);
             LatLng latLng = new LatLng(resultSet.getFloat(1), resultSet.getFloat(2));
-            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(resultSet.getString(3))
-//                    .snippet(resultSet.getInt(0)+"")
-;
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(resultSet.getString(3));
             MarkerOptionsSpec mSpec = new MarkerOptionsSpec();
             mSpec.marker = markerOptions;
             mSpec.id = mInt;

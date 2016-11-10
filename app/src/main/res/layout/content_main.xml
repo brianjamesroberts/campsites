@@ -28,8 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="14dp"
             android:layout_marginRight="14dp"
-            android:layout_marginTop="20dp"
-            android:padding="10dp"
+            android:layout_marginTop="15dp"
+            android:padding="8dp"
             android:background="#c8fafafa">
             <android.support.v7.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
