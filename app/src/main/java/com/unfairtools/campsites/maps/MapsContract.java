@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.unfairtools.campsites.MainActivity;
 import com.unfairtools.campsites.base.BasePresenter;
 import com.unfairtools.campsites.base.BaseView;
 
@@ -23,7 +24,17 @@ public interface MapsContract {
 
         void zoomLocation(int x, int y, int zoom);
 
+        MainActivity getMainActivity();
+
         FragmentManager getFragmentManager2();
+    }
+
+    interface MarkerInfoView extends BaseView<MarkerInfoPresenter> {
+        MainActivity getMainActivity();
+    }
+
+    interface MarkerInfoPresenter extends BasePresenter {
+
     }
 
     interface Presenter extends BasePresenter {

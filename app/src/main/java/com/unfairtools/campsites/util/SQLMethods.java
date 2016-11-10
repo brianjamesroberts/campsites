@@ -22,6 +22,83 @@ public class SQLMethods {
 
     }
 
+    public static void setMapPrefs(SQLiteDatabase db,LatLng target, float zoom){
+        db.beginTransaction();
+        try{
+
+            //if(!SQLMethods.existsRecord(Constants.LOCATIONS_INFO_TABLE_NAME,Constants.LocationsInfoTable.id_primary_key,id +"",db)) {
+                ContentValues args = new ContentValues();
+                args.put(Constants.MapPreferencesTable.id_primary_key, 0);
+                args.put(Constants.MapPreferencesTable.latitude, target.latitude);
+                args.put(Constants.MapPreferencesTable.longitude, target.longitude);
+                args.put(Constants.MapPreferencesTable.zoom, zoom);
+                db.update(Constants.MAP_PREFERENCES_TABLE_NAME, args, Constants.MapPreferencesTable.id_primary_key +" = 0",null);
+
+
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            db.endTransaction();
+        }
+    }
+
+    public static float getMapLocationZoom(SQLiteDatabase db){
+        float retFloat = 0.0f;
+
+        Cursor resultSet = null;
+
+        db.beginTransaction();
+        try{
+
+            resultSet = db.rawQuery("Select * from " + Constants.MAP_PREFERENCES_TABLE_NAME+ " WHERE " +
+                    Constants.MapPreferencesTable.id_primary_key + " = '0';", null);
+            if(resultSet==null || resultSet.getCount()<1) {
+                Log.e("SQLMethods", "zoom was empty");
+            return retFloat;
+            }
+
+            resultSet.moveToFirst();
+
+            retFloat = resultSet.getFloat(3);
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            resultSet.close();
+            db.endTransaction();
+            return retFloat;
+        }
+
+    }
+
+    public static LatLng getMapLocationLatLng(SQLiteDatabase db){
+        LatLng retLatLng = new LatLng(0.0f,0.0f);
+        Cursor resultSet = null;
+        db.beginTransaction();
+        try{
+
+
+            resultSet = db.rawQuery("Select * from " + Constants.MAP_PREFERENCES_TABLE_NAME + " WHERE " +
+                    Constants.MapPreferencesTable.id_primary_key + " = 0;", null);
+            if(resultSet==null)
+                return retLatLng;
+            if(resultSet.getCount()<1)
+                return retLatLng;
+            resultSet.moveToFirst();
+            retLatLng = new LatLng(resultSet.getDouble(1),resultSet.getDouble(2));
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+
+        }finally{
+            resultSet.close();
+            db.endTransaction();
+            return retLatLng;
+        }
+
+    }
+
     public static ArrayList<SQLMethods.MarkerOptionsSpec>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
         ArrayList<SQLMethods.MarkerOptionsSpec> returnMarkers = new ArrayList<SQLMethods.MarkerOptionsSpec>();
 
@@ -101,6 +178,7 @@ public class SQLMethods {
 
         public final static String MAP_PREFERENCES_TABLE_NAME = "MAP_PREFERENCES";
         public class MapPreferencesTable{
+            public final static String id_primary_key = "id";
             public final static String longitude = "longitude";
             public final static String latitude = "latitude";
             public final static String zoom = "zoom";

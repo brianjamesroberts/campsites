@@ -14,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import com.unfairtools.campsites.MainActivity;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
 import com.unfairtools.campsites.dagger.component.DaggerMarkerInfoFragmentComponent;
@@ -47,6 +48,10 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 
     private OnFragmentInteractionListener mListener;
 
+
+    public MainActivity getMainActivity(){
+        return (MainActivity)getActivity();
+    }
 
     public FragmentManager getFragmentManager2(){
         return getActivity().getFragmentManager();

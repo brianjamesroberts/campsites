@@ -76,9 +76,16 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     public boolean onMarkerClick(Marker m){
         m.showInfoWindow();
         log("Marker clicked id "  +  m.getId() + ", id: " + markerHashMap.get(m));
-        ShowMarkerDetailsDialogFragment f;//= (ShowMarkerDetailsDialogFragment)view.getFragmentManager2().findFragmentByTag("dialog1");
-        f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
-        f.show(view.getFragmentManager2(),"dialog1");
+//        ShowMarkerDetailsDialogFragment f;//= (ShowMarkerDetailsDialogFragment)view.getFragmentManager2().findFragmentByTag("dialog1");
+//        f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
+//        f.show(view.getFragmentManager2(),"dialog1");
+
+
+        view.getMainActivity().putMarkerInfoFragment(markerHashMap.get(m), m.getTitle());
+        //view.getMainActivity().setToolbarVisible(false);
+
+
+
         return true;
 
     }
@@ -104,6 +111,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void loadMarkers(final LatLngBounds latLngBounds){
 
+        loadMarkersLocal(latLngBounds);
+        placeMarkersOnMap(googleMap, null);
 
 
         new Thread(){
@@ -127,7 +136,6 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                                 InfoObject inf = response.body();
                                 System.out.println(inf.names);
                                 if(response.body().names!=null) {
-                                    loadMarkersLocal(latLngBounds);
                                     placeMarkersOnMap(googleMap, response.body());
                                 }
                             }
@@ -138,6 +146,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     }
                     @Override
                     public void onFailure(Call<InfoObject> call, Throwable t) {
+
 
                         Log.e("resp","failed " + t.toString() + " is executed: " + call.isExecuted());
                     }
@@ -152,16 +161,18 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         markerOptionsHashMap.clear();
 
 
-        for(int i = 0; i < inf.ids.length; i++){
-            MarkerOptions mo = new MarkerOptions()
-                    .position(new LatLng(inf.latitudes[i],inf.longitudes[i]))
-                    .title(inf.names[i]);
+        if(inf!=null) {
+            for (int i = 0; i < inf.ids.length; i++) {
+                MarkerOptions mo = new MarkerOptions()
+                        .position(new LatLng(inf.latitudes[i], inf.longitudes[i]))
+                        .title(inf.names[i]);
 
-            if(!markerOptionsHashMapLocal.containsValue(inf.ids[i])) {
-                markerOptionsHashMap.put(mo, inf.ids[i]);
-                Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
-            }else {
-                Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
+                if (!markerOptionsHashMapLocal.containsValue(inf.ids[i])) {
+                    markerOptionsHashMap.put(mo, inf.ids[i]);
+                    Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
+                } else {
+                    Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
+                }
             }
         }
 
@@ -184,16 +195,28 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         googleMap.setOnMarkerClickListener(this);
 
+        view.getMainActivity().replaceSearchBarText();
+
         db.beginTransaction();
         SQLMethods.addLocation(db,0,48.0356029f,-123.424074f,"Heart O the Hills Campground",0);
         SQLMethods.addLocationInfo(db,0,"The beautiful Heart O' the Hills Campground","",4.5f,"I hate this place\n");
         db.setTransactionSuccessful();
         db.endTransaction();
         LatLng lat = new LatLng(47.51f,-122.35f);
-        gm.moveCamera(CameraUpdateFactory.newLatLngZoom(lat,6.833f));
+
+        LatLng lat2 = SQLMethods.getMapLocationLatLng(db);
+        float zoom = SQLMethods.getMapLocationZoom(db);
+
+        Log.e("MapsPresenter", "latLong: " + lat2.latitude + ", " + lat2.longitude + " :: zoom " + zoom);
+
+        //6.833f = zoom default
+        gm.moveCamera(CameraUpdateFactory.newLatLngZoom(lat2,zoom));
         gm.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition location) {
+
+
+                SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
 
 
                 markerHashMap.clear();
