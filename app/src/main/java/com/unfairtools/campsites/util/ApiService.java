@@ -18,11 +18,16 @@ package com.unfairtools.campsites.util;
  */
 
 public interface ApiService {
+
+
     @POST("login")
     public Call<InfoObject> postLogin(@Header("username") String username, @Header("password") String password);
 
     @POST ("boundsformarkers")
     public Call<InfoObject> postBoundsForMarkers(@Body InfoObject info);
+
+    @POST ("idformarkerinfo")
+    public Call<MarkerInfoObject> postIdForMarkerInfo(@Body InfoObject info);
 //
 //    @POST("invites")
 //    public Call<InfoObject> postInvites(@Header("username") String username);

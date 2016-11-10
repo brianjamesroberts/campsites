@@ -1,7 +1,6 @@
 package com.unfairtools.campsites;
 
 
-import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,14 +23,13 @@ import android.widget.AutoCompleteTextView;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.ui.LocationDetailsFragment;
 import com.unfairtools.campsites.ui.MapFragment;
-import com.unfairtools.campsites.ui.ShowMarkerDetailsDialogFragment;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener,
-        ShowMarkerDetailsDialogFragment.OnFragmentInteractionListener, LocationDetailsFragment.OnFragmentInteractionListener
+         LocationDetailsFragment.OnFragmentInteractionListener
         {
 
             @Inject
@@ -118,68 +116,7 @@ public class MainActivity extends AppCompatActivity
                 .addToBackStack("map_fragment").commit();
     }
 
-    public void initDatabaseCheck(){
-        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_TABLE_NAME)){
-            Log.e("MainActivity","Creating table " + SQLMethods.Constants.LOCATIONS_TABLE_NAME);
-            db.beginTransaction();
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " +
-                    SQLMethods.Constants.LOCATIONS_TABLE_NAME +
-                    "("
-                            +  SQLMethods.Constants.LocationsTable.id_primary_key + " INTEGER PRIMARY KEY,"
-                            +  SQLMethods.Constants.LocationsTable.latitude +" REAL,"
-                            +  SQLMethods.Constants.LocationsTable.longitude +" REAL,"
-                            +  SQLMethods.Constants.LocationsTable.name + " VARCHAR,"
-                            +  SQLMethods.Constants.LocationsTable.type+" INTEGER"
-                            +");");
-            db.setTransactionSuccessful();
-            db.endTransaction();
 
-
-        }
-        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME)){
-            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME);
-            db.beginTransaction();
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " +
-                    SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME +
-                    "("
-                            + SQLMethods.Constants.MapPreferencesTable.id_primary_key + " INTEGER PRIMARY KEY,"
-                            + SQLMethods.Constants.MapPreferencesTable.latitude + " REAL,"
-                            + SQLMethods.Constants.MapPreferencesTable.longitude + " REAL,"
-                            +SQLMethods.Constants.MapPreferencesTable.zoom + " REAL"
-                            + ");");
-            db.setTransactionSuccessful();
-            db.endTransaction();
-
-            db.beginTransaction();
-            ContentValues args = new ContentValues();
-            args.put(SQLMethods.Constants.MapPreferencesTable.id_primary_key, 0);
-            args.put(SQLMethods.Constants.MapPreferencesTable.latitude, 47.51f);
-            args.put(SQLMethods.Constants.MapPreferencesTable.longitude, -122.35f);
-            args.put(SQLMethods.Constants.MapPreferencesTable.zoom, 6.833f);
-            db.insert(SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME, null, args);//, Constants.LocationsTable.id_primary_key + " = '" + id + "'", null);
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        }
-        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME)){
-            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME);
-            db.beginTransaction();
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " +
-                            SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME +
-                            "("
-                    + SQLMethods.Constants.LocationsInfoTable.id_primary_key + " INTEGER PRIMARY KEY,"
-                    + SQLMethods.Constants.LocationsInfoTable.description + " VARCHAR,"
-                    + SQLMethods.Constants.LocationsInfoTable.imagesurl + " VARCHAR,"
-                    + SQLMethods.Constants.LocationsInfoTable.cached_rating + " REAL,"
-                    + SQLMethods.Constants.LocationsInfoTable.cached_comments + " VARCHAR"
-                    +");"
-            );
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        }
-    }
 
 
 
@@ -197,7 +134,7 @@ public class MainActivity extends AppCompatActivity
 
         ((BaseApplication)getApplication()).getServicesComponent().inject(this);
 
-        initDatabaseCheck();
+        SQLMethods.initDatabaseCheck(db);
 
         putMapFragment();
 

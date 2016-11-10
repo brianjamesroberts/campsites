@@ -137,15 +137,16 @@ public class SQLMethods {
 
     }
 
-    public static void addLocationInfo(SQLiteDatabase db, int id, String description, String imagesurl,
-                                       float cachedRating, String cachedComments){
-        if(!SQLMethods.existsRecord(Constants.LOCATIONS_INFO_TABLE_NAME,Constants.LocationsInfoTable.id_primary_key,id +"",db)) {
+    public static void addLocationInfo(SQLiteDatabase db, MarkerInfoObject object){
+        if(!SQLMethods.existsRecord(Constants.LOCATIONS_INFO_TABLE_NAME,Constants.LocationsInfoTable.id_primary_key,object.id_primary_key +"",db)) {
             ContentValues args = new ContentValues();
-            args.put(Constants.LocationsInfoTable.id_primary_key, id);
-            args.put(Constants.LocationsInfoTable.description, description);
-            args.put(Constants.LocationsInfoTable.imagesurl, imagesurl);
-            args.put(Constants.LocationsInfoTable.cached_rating, cachedRating);
-            args.put(Constants.LocationsInfoTable.cached_comments, cachedComments);
+            args.put(Constants.LocationsInfoTable.id_primary_key, object.id_primary_key);
+            args.put(Constants.LocationsInfoTable.description, object.description);
+            args.put(Constants.LocationsInfoTable.website, object.website);
+            args.put(Constants.LocationsInfoTable.phone,object.phone);
+            args.put(Constants.LocationsInfoTable.google_url,object.google_url);
+            args.put(Constants.LocationsInfoTable.season,object.season);
+            args.put(Constants.LocationsInfoTable.facilities,object.facilities);
             db.insert(Constants.LOCATIONS_INFO_TABLE_NAME,null, args);
         }
     }
@@ -185,9 +186,11 @@ public class SQLMethods {
         public class LocationsInfoTable{
             public final static String id_primary_key = "id";
             public final static String description = "description";
-            public final static String imagesurl = "images_url";
-            public final static String cached_rating = "cached_rating";
-            public final static String cached_comments = "cached_comments";
+            public final static String website = "website";
+            public final static String phone = "phone";
+            public final static String google_url = "google_url";
+            public final static String season = "season";
+            public final static String facilities = "facilities";
         }
 
     }
@@ -233,6 +236,71 @@ public class SQLMethods {
         cursor.close();
         return true;
 
+    }
+
+    public static void initDatabaseCheck(SQLiteDatabase db){
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_TABLE_NAME)){
+            Log.e("MainActivity","Creating table " + SQLMethods.Constants.LOCATIONS_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            SQLMethods.Constants.LOCATIONS_TABLE_NAME +
+                            "("
+                            +  SQLMethods.Constants.LocationsTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                            +  SQLMethods.Constants.LocationsTable.latitude +" REAL,"
+                            +  SQLMethods.Constants.LocationsTable.longitude +" REAL,"
+                            +  SQLMethods.Constants.LocationsTable.name + " VARCHAR,"
+                            +  SQLMethods.Constants.LocationsTable.type+" INTEGER"
+                            +");");
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+
+        }
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME)){
+            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME +
+                            "("
+                            + SQLMethods.Constants.MapPreferencesTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                            + SQLMethods.Constants.MapPreferencesTable.latitude + " REAL,"
+                            + SQLMethods.Constants.MapPreferencesTable.longitude + " REAL,"
+                            +SQLMethods.Constants.MapPreferencesTable.zoom + " REAL"
+                            + ");");
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.beginTransaction();
+            ContentValues args = new ContentValues();
+            args.put(SQLMethods.Constants.MapPreferencesTable.id_primary_key, 0);
+            args.put(SQLMethods.Constants.MapPreferencesTable.latitude, 47.51f);
+            args.put(SQLMethods.Constants.MapPreferencesTable.longitude, -122.35f);
+            args.put(SQLMethods.Constants.MapPreferencesTable.zoom, 6.833f);
+            db.insert(SQLMethods.Constants.MAP_PREFERENCES_TABLE_NAME, null, args);//, Constants.LocationsTable.id_primary_key + " = '" + id + "'", null);
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+        if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME)){
+            Log.e("MainActivity", "Creating table " + SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME);
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME +
+                            "("
+                            + SQLMethods.Constants.LocationsInfoTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                            + SQLMethods.Constants.LocationsInfoTable.description + " VARCHAR,"
+                            + SQLMethods.Constants.LocationsInfoTable.website + " VARCHAR,"
+                            + SQLMethods.Constants.LocationsInfoTable.phone + " VARCHAR,"
+                            + SQLMethods.Constants.LocationsInfoTable.google_url + " VARCHAR,"
+                            + SQLMethods.Constants.LocationsInfoTable.season + " VARCHAR,"
+                            + SQLMethods.Constants.LocationsInfoTable.facilities + " VARCHAR"
+
+                            +");"
+            );
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
 

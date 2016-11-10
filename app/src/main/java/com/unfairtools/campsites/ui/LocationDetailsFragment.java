@@ -8,10 +8,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.unfairtools.campsites.MainActivity;
 import com.unfairtools.campsites.R;
+import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.dagger.component.DaggerMarkerInfoFragmentComponent;
+import com.unfairtools.campsites.dagger.module.MarkerInfoFragmentModule;
 import com.unfairtools.campsites.maps.MapsContract;
+import com.unfairtools.campsites.maps.MarkerInfoContract;
+import com.unfairtools.campsites.maps.MarkerInfoFragmentPresenter;
+import com.unfairtools.campsites.util.InfoObject;
+import com.unfairtools.campsites.util.MarkerInfoObject;
+
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,11 +32,31 @@ import com.unfairtools.campsites.maps.MapsContract;
  * Use the {@link LocationDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LocationDetailsFragment extends Fragment implements MapsContract.MarkerInfoView {
+public class LocationDetailsFragment extends Fragment implements MarkerInfoContract.View {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+
+    @Inject
+    MarkerInfoFragmentPresenter presenter;
+
+
+
+    public void takeInfo(MarkerInfoObject inf){
+
+        ((ProgressBar)getView().findViewById(R.id.progress_bar_marker_info)).setVisibility(View.GONE);
+        ((TextView)getView().findViewById(R.id.title_text_marker_info)).setText(inf.description);
+
+    }
+
+    public void takePrelimInfo(InfoObject inf){
+
+        Log.e("ShowMDDF", "my id: "  + inf.ids[0]);
+
+
+    }
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -53,10 +84,18 @@ public class LocationDetailsFragment extends Fragment implements MapsContract.Ma
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int id = -1;
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            id = getArguments().getInt("id");
         }
+
+        DaggerMarkerInfoFragmentComponent.builder()
+                .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication)getActivity().getApplication()))
+                .build()
+                .inject(this);
+
+        presenter.setMarkerIdAndName(id);
+
     }
 
     @Override

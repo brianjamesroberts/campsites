@@ -2,7 +2,7 @@ package com.unfairtools.campsites.dagger.module;
 
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.maps.MarkerInfoContract;
-import com.unfairtools.campsites.maps.MarkerInfoDialogFragmentPresenter;
+import com.unfairtools.campsites.maps.MarkerInfoFragmentPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -26,7 +26,7 @@ public class MarkerInfoFragmentModule {
 
 
     @Provides
-    MarkerInfoDialogFragmentPresenter providePresenter() {
-        return new MarkerInfoDialogFragmentPresenter(view,base);
+    MarkerInfoFragmentPresenter providePresenter() {
+        return new MarkerInfoFragmentPresenter(view,base);
     }
 }

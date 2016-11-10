@@ -1,7 +1,7 @@
 package com.unfairtools.campsites.dagger.component;
 
 import com.unfairtools.campsites.dagger.module.MarkerInfoFragmentModule;
-import com.unfairtools.campsites.ui.ShowMarkerDetailsDialogFragment;
+import com.unfairtools.campsites.ui.LocationDetailsFragment;
 
 import dagger.Component;
 
@@ -16,6 +16,6 @@ import dagger.Component;
 
 
 public interface MarkerInfoFragmentComponent {
-    void inject(ShowMarkerDetailsDialogFragment fragment);
+    void inject(LocationDetailsFragment fragment);
 }
 

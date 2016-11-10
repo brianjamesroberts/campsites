@@ -1,9 +1,6 @@
 package com.unfairtools.campsites.maps;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
-import android.support.v4.app.DialogFragment;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,23 +14,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
-import com.unfairtools.campsites.ui.MapFragment;
-import com.unfairtools.campsites.ui.ShowMarkerDetailsDialogFragment;
 import com.unfairtools.campsites.util.ApiService;
 import com.unfairtools.campsites.util.InfoObject;
+import com.unfairtools.campsites.util.MarkerInfoObject;
 import com.unfairtools.campsites.util.SQLMethods;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by brianroberts on 10/26/16.
@@ -96,7 +90,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         ArrayList<SQLMethods.MarkerOptionsSpec> localSaves = SQLMethods.getMarkers(db,latLngBounds);
 
-        markerOptionsHashMapLocal.clear();
+        //markerOptionsHashMapLocal.clear();
 
         Log.e("MapsPresenter", localSaves.size() + " localsaves");
 
@@ -158,7 +152,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void placeMarkersOnMap(GoogleMap googleMap, InfoObject inf){
 
-        markerOptionsHashMap.clear();
+        //markerOptionsHashMap.clear();
 
 
         if(inf!=null) {
@@ -199,7 +193,9 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         db.beginTransaction();
         SQLMethods.addLocation(db,0,48.0356029f,-123.424074f,"Heart O the Hills Campground",0);
-        SQLMethods.addLocationInfo(db,0,"The beautiful Heart O' the Hills Campground","",4.5f,"I hate this place\n");
+        MarkerInfoObject obj = new MarkerInfoObject();
+        obj.id_primary_key = 0; obj.description = "The beautiful Heart O' the Hills Campground";
+        SQLMethods.addLocationInfo(db,obj);
         db.setTransactionSuccessful();
         db.endTransaction();
         LatLng lat = new LatLng(47.51f,-122.35f);
@@ -219,10 +215,11 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
 
 
-                markerHashMap.clear();
+                //markerHashMap.clear();
 
 
                 googleMap.clear();
+
 
 
                 loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
