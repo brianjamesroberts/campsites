@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.unfairtools.campsites.ui.LocationDetailsFragment"
-    android:paddingTop = "80dp">
+    android:paddingTop = "80dp"
+    android:background="#FFFFFF">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

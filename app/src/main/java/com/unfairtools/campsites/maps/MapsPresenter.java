@@ -105,7 +105,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void loadMarkers(final LatLngBounds latLngBounds){
 
-        loadMarkersLocal(latLngBounds);
+
         placeMarkersOnMap(googleMap, null);
 
 
@@ -117,6 +117,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 inf.latSouth = latLngBounds.southwest.latitude;
                 inf.longWest = latLngBounds.southwest.longitude;
                 Call<InfoObject> call = apiService.postBoundsForMarkers(inf);
+                Log.e("MapsPresenter","Requesting markers");
                 call.enqueue(new Callback<InfoObject>(){
                     @Override
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
@@ -163,9 +164,9 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
                 if (!markerOptionsHashMapLocal.containsValue(inf.ids[i])) {
                     markerOptionsHashMap.put(mo, inf.ids[i]);
-                    Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
+                    //Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
                 } else {
-                    Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
+                    //Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
                 }
             }
         }
@@ -173,6 +174,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         Set<MarkerOptions> localMarkers =  markerOptionsHashMapLocal.keySet();
         Set<MarkerOptions> iMarkers = markerOptionsHashMap.keySet();
 
+        googleMap.clear();
         for(MarkerOptions m : localMarkers){
             markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMapLocal.get(m));
         }
@@ -206,23 +208,39 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         Log.e("MapsPresenter", "latLong: " + lat2.latitude + ", " + lat2.longitude + " :: zoom " + zoom);
 
         //6.833f = zoom default
+
+
+        gm.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+
+                SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
+                markerHashMap.clear();
+                googleMap.clear();
+                loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
+                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
+            }
+        });
+
         gm.moveCamera(CameraUpdateFactory.newLatLngZoom(lat2,zoom));
+
+
         gm.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition location) {
 
-
-                SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
-
-
-                //markerHashMap.clear();
-
-
-                googleMap.clear();
-
-
-
-                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
+//                SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
+//
+//
+//                //markerHashMap.clear();
+//
+//
+//                googleMap.clear();
+//
+//
+//
+//                loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
+//                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
             }
         });
     }

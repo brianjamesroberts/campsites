@@ -96,6 +96,9 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
 
         presenter.setMarkerIdAndName(id);
 
+
+
+
     }
 
     @Override

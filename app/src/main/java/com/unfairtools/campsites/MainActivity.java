@@ -68,14 +68,16 @@ public class MainActivity extends AppCompatActivity
 
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
+                //ft.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
+                ft.setCustomAnimations(R.anim.slide_up,R.anim.slide_up,R.anim.slide_up,R.anim.slide_down);
 
 
 //                fm.beginTransaction().replace(R.id.map_cointainer,locationDetailsFragment,"marker_info_fragment")
 //                        .addToBackStack("map_container")
 //                        .commit();
 
-                ft.replace(R.id.map_cointainer, locationDetailsFragment, "marker_info_fragment").addToBackStack("map_container");
+                ft.add(R.id.map_cointainer, locationDetailsFragment, "marker_info_fragment").addToBackStack("map_container");
+                //ft.replace(R.id.map_cointainer, locationDetailsFragment, "marker_info_fragment").addToBackStack("map_container");
                 ft.commit();
 
                 searchBarText = ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).getText().toString();
