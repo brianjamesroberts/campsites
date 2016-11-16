@@ -1,8 +1,8 @@
 package com.unfairtools.campsites.dagger.module;
 
 import com.unfairtools.campsites.base.BaseApplication;
-import com.unfairtools.campsites.maps.MarkerInfoContract;
-import com.unfairtools.campsites.maps.MarkerInfoFragmentPresenter;
+import com.unfairtools.campsites.contracts.MarkerInfoContract;
+import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
 
 import dagger.Module;
 import dagger.Provides;

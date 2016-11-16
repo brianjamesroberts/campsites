@@ -1,4 +1,4 @@
-package com.unfairtools.campsites.maps;
+package com.unfairtools.campsites.contracts;
 
 import com.unfairtools.campsites.base.BasePresenter;
 import com.unfairtools.campsites.base.BaseView;

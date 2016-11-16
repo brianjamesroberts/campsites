@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -16,11 +15,62 @@ import java.util.ArrayList;
 public class SQLMethods {
 
 
-    public static class MarkerOptionsSpec{
+    public static class MarkerOptionsTuple {
         public MarkerOptions marker;
         public Integer id;
 
     }
+
+
+    public static MarkerInfoObject getMarkerInfoLocal(int id,SQLiteDatabase db){
+
+
+
+        MarkerInfoObject returnObj = null;
+
+
+        Cursor resultSet = null;
+        db.beginTransaction();
+        try{
+
+            resultSet = db.rawQuery("Select * from " + Constants.LOCATIONS_INFO_TABLE_NAME + " WHERE " +
+                    Constants.LocationsInfoTable.id_primary_key + " = " + id +";", null);
+            if(resultSet==null)
+                return null;
+            if(resultSet.getCount()<1)
+                return null;
+            resultSet.moveToFirst();
+            returnObj = new MarkerInfoObject();
+
+//            + SQLMethods.Constants.LocationsInfoTable.id_primary_key + " INTEGER PRIMARY KEY,"
+//                    + SQLMethods.Constants.LocationsInfoTable.description + " VARCHAR,"
+//                    + SQLMethods.Constants.LocationsInfoTable.website + " VARCHAR,"
+//                    + SQLMethods.Constants.LocationsInfoTable.phone + " VARCHAR,"
+//                    + SQLMethods.Constants.LocationsInfoTable.google_url + " VARCHAR,"
+//                    + SQLMethods.Constants.LocationsInfoTable.season + " VARCHAR,"
+//                    + SQLMethods.Constants.LocationsInfoTable.facilities + " VARCHAR"
+//            retLatLng = new LatLng(resultSet.getDouble(1),resultSet.getDouble(2));
+            returnObj.id_primary_key = resultSet.getInt(0);
+            returnObj.description = resultSet.getString(1);
+            returnObj.website = resultSet.getString(2);
+            returnObj.phone = resultSet.getString(3);
+            returnObj.google_url = resultSet.getString(4);
+            returnObj.season = resultSet.getString(5);
+            returnObj.facilities = resultSet.getString(6);
+
+
+
+            resultSet.close();
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+
+        }finally{
+            db.endTransaction();
+        }
+        return returnObj;
+    }
+
 
     public static void setMapPrefs(SQLiteDatabase db,LatLng target, float zoom){
         db.beginTransaction();
@@ -98,8 +148,8 @@ public class SQLMethods {
 
     }
 
-    public static ArrayList<SQLMethods.MarkerOptionsSpec>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
-        ArrayList<SQLMethods.MarkerOptionsSpec> returnMarkers = new ArrayList<SQLMethods.MarkerOptionsSpec>();
+    public static ArrayList<MarkerOptionsTuple>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
+        ArrayList<MarkerOptionsTuple> returnMarkers = new ArrayList<MarkerOptionsTuple>();
 
         Log.e("SQLMETHODS", "latLngBounds.southewest: " + latLngBounds.southwest.toString());
 
@@ -123,7 +173,7 @@ public class SQLMethods {
             Integer mInt = resultSet.getInt(0);
             LatLng latLng = new LatLng(resultSet.getFloat(1), resultSet.getFloat(2));
             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(resultSet.getString(3));
-            MarkerOptionsSpec mSpec = new MarkerOptionsSpec();
+            MarkerOptionsTuple mSpec = new MarkerOptionsTuple();
             mSpec.marker = markerOptions;
             mSpec.id = mInt;
             returnMarkers.add(mSpec);

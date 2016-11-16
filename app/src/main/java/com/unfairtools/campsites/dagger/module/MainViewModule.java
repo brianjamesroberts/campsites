@@ -1,36 +1,33 @@
 package com.unfairtools.campsites.dagger.module;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.unfairtools.campsites.base.BaseApplication;
-import com.unfairtools.campsites.contracts.MapsContract;
-import com.unfairtools.campsites.presenters.MapsPresenter;
+import com.unfairtools.campsites.presenters.MainActivityPresenter;
+import com.unfairtools.campsites.contracts.MainContract;
 import com.unfairtools.campsites.util.OpenHelper;
 
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by newuser on 10/27/16.
+ * Created by brianroberts on 11/15/16.
  */
 
-
 @Module
-public class MapsModule {
+public class MainViewModule {
 
-    private MapsContract.View view;
-    private Context context;
+    private MainContract.View view;
     private BaseApplication base;
 
-    public MapsModule(MapsContract.View v, BaseApplication b) {
+    public MainViewModule(MainContract.View v, BaseApplication b) {
         view = v;
         base = b;
     }
 
     @Provides
-    MapsPresenter providePresenter() {
-        return new MapsPresenter(view,base);
+    MainActivityPresenter providePresenter() {
+        return new MainActivityPresenter(view,base);
     }
 
     @Provides

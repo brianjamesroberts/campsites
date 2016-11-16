@@ -4,6 +4,7 @@ package com.unfairtools.campsites;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,8 +20,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 
 import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.dagger.component.DaggerMainViewComponent;
+import com.unfairtools.campsites.dagger.module.MainViewModule;
+import com.unfairtools.campsites.presenters.MainActivityPresenter;
+import com.unfairtools.campsites.contracts.MainContract;
+
 import com.unfairtools.campsites.ui.LocationDetailsFragment;
 import com.unfairtools.campsites.ui.MapFragment;
 import com.unfairtools.campsites.util.SQLMethods;
@@ -29,8 +36,12 @@ import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MapFragment.OnFragmentInteractionListener,
-         LocationDetailsFragment.OnFragmentInteractionListener
-        {
+         LocationDetailsFragment.OnFragmentInteractionListener, MainContract.View {
+
+            public static int ToolbarMargin = 30;
+
+            @Inject
+            public MainActivityPresenter presenter;
 
             @Inject
             SQLiteDatabase db;
@@ -41,14 +52,15 @@ public class MainActivity extends AppCompatActivity
             private String searchBarText = new String();
 
 
-            public void setToggleHamburgerVisibility(boolean visible){
+            public FrameLayout getToolbarFrameLayout(){
+                return (FrameLayout) findViewById(R.id.searchbar_framelayout);
+            }
 
+            public void setToggleHamburgerVisibility(boolean visible){
                 if(visible) {
                     toggle.setDrawerArrowDrawable(toggle.getDrawerArrowDrawable());
                 }
-
             }
-
 
 
     public void onFragmentInteraction(Uri uri){
@@ -68,16 +80,10 @@ public class MainActivity extends AppCompatActivity
 
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                //ft.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
                 ft.setCustomAnimations(R.anim.slide_up,R.anim.slide_up,R.anim.slide_up,R.anim.slide_down);
 
 
-//                fm.beginTransaction().replace(R.id.map_cointainer,locationDetailsFragment,"marker_info_fragment")
-//                        .addToBackStack("map_container")
-//                        .commit();
-
                 ft.add(R.id.map_cointainer, locationDetailsFragment, "marker_info_fragment").addToBackStack("map_container");
-                //ft.replace(R.id.map_cointainer, locationDetailsFragment, "marker_info_fragment").addToBackStack("map_container");
                 ft.commit();
 
                 searchBarText = ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).getText().toString();
@@ -90,9 +96,6 @@ public class MainActivity extends AppCompatActivity
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setHomeButtonEnabled(true);
-
-                //drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
 
 
 
@@ -120,27 +123,42 @@ public class MainActivity extends AppCompatActivity
 
 
 
-
-
-            @Override
-            public boolean onPrepareOptionsMenu(Menu menu){
-                for(int i = 0; i < menu.size(); i++){
-                    menu.getItem(i).setVisible(false);
-                }
-                return true;
-            }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        for(int i = 0; i < menu.size(); i++){
+            menu.getItem(i).setVisible(false);
+        }
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((BaseApplication)getApplication()).getServicesComponent().inject(this);
+//      ((BaseApplication)getApplication()).getServicesComponent().inject(this);
+
+        DaggerMainViewComponent.builder()
+                .mainViewModule(new MainViewModule(this, (BaseApplication)getApplication()))
+                .build()
+                .inject(this);
+
+
+
 
         SQLMethods.initDatabaseCheck(db);
 
         putMapFragment();
 
         setContentView(R.layout.activity_main);
+
+
+        ((FloatingActionButton)findViewById(R.id.fab)).setOnClickListener(new FloatingActionButton.OnClickListener(){
+            public void onClick(View v){
+
+                Log.e("MainActivity", "CLICK");
+
+            }
+        });
 
         toolbar = (Toolbar) findViewById(R.id.custom_toolbar);
 
@@ -156,53 +174,10 @@ public class MainActivity extends AppCompatActivity
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-
-        //ImageButton hamburgerButton = (ImageButton)findViewById(R.id.hamburger_button);
-
-//DrawerArrowDrawable dad = new DrawerArrowDrawable(this);
-  //     dad.
-//        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawer,
-//                dad, R.string.drawer_open,
-//                R.string.drawer_close);
-
-
-//        e(Activity activity, Toolbar toolbar, DrawerLayout drawerLayout,
-//                DrawerArrowDrawable slider, @StringRes int openDrawerContentDescRes,
-//        @StringRes int closeDrawerContentDescRes)
-
-        //ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,null,drawer,dad,R.string.drawer_open,R.string.drawer_close);
-//        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawer,
-//                null, R.string.drawer_open, R.string.drawer_close) {
-//
-//            /** Called when a drawer has settled in a completely closed state. */
-//            public void onDrawerClosed(View view) {
-//                super.onDrawerClosed(view);
-//                Log.e("Drawer","Drawer closed");
-//                //getActionBar().setTitle();
-//                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//            }
-//
-//            /** Called when a drawer has settled in a completely open state. */
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);
-//                Log.e("Drawer","Drawer opened");
-//                //getActionBar().setTitle(mDrawerTitle);
-//                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//            }
-//
-//        };
-
-        // Set the drawer toggle as the DrawerListener
-       // drawer.setDrawerListener(mDrawerToggle);
-
-
-
          toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -218,6 +193,7 @@ public class MainActivity extends AppCompatActivity
                         //nBackPressed();
                     }
                 }
+
                 Log.e("MainActivity","Navigation clicked");
             }
         });
@@ -246,6 +222,7 @@ public class MainActivity extends AppCompatActivity
             Log.e("MainActivity","closing drawer from back button");
             drawer.closeDrawer(GravityCompat.START);
         } else if(getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            presenter.animateToolbarMargin(MainActivity.ToolbarMargin);
                 super.onBackPressed();
         }else {
                 Log.e("Main Activity","Back pressed");

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,9 +17,8 @@ import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMarkerInfoFragmentComponent;
 import com.unfairtools.campsites.dagger.module.MarkerInfoFragmentModule;
-import com.unfairtools.campsites.maps.MapsContract;
-import com.unfairtools.campsites.maps.MarkerInfoContract;
-import com.unfairtools.campsites.maps.MarkerInfoFragmentPresenter;
+import com.unfairtools.campsites.contracts.MarkerInfoContract;
+import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.MarkerInfoObject;
 
@@ -84,21 +84,30 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DaggerMarkerInfoFragmentComponent.builder()
+                .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication)getActivity().getApplication()))
+                .build()
+                .inject(this);
+
+
+
+
+
+
+    }
+
+
+    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
         int id = -1;
         if (getArguments() != null) {
             id = getArguments().getInt("id");
         }
 
         DaggerMarkerInfoFragmentComponent.builder()
-                .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication)getActivity().getApplication()))
+                .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication) getActivity().getApplication()))
                 .build()
                 .inject(this);
-
         presenter.setMarkerIdAndName(id);
-
-
-
-
     }
 
     @Override
@@ -132,6 +141,9 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
         getMainActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getMainActivity().getSupportActionBar().setHomeButtonEnabled(false);
         getMainActivity().getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
+        ((AutoCompleteTextView)getMainActivity().findViewById(R.id.main_search_bar)).setText("");
+        ((AutoCompleteTextView)getMainActivity().findViewById(R.id.main_search_bar)).setEnabled(true);
+        //getMainActivity().presenter.animateToolbarMargin(MainActivity.ToolbarMargin);
         getMainActivity().setToggleHamburgerVisibility(true);
         Log.e("LocationDetailsFrag", "onDetach called");
         mListener = null;

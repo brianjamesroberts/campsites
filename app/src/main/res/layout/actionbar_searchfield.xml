@@ -10,6 +10,8 @@
         android:maxLines="1"
         android:textSize="14sp"
         android:textColor="#212121"
-        android:id="@+id/main_search_bar"/>
+        android:id="@+id/main_search_bar"
+        android:inputType="text|textNoSuggestions"
+        />
 
 </RelativeLayout>

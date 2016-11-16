@@ -1,6 +1,10 @@
-package com.unfairtools.campsites.maps;
+package com.unfairtools.campsites.presenters;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.contracts.MapsContract;
 import com.unfairtools.campsites.util.ApiService;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.MarkerInfoObject;
@@ -70,14 +75,10 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     public boolean onMarkerClick(Marker m){
         m.showInfoWindow();
         log("Marker clicked id "  +  m.getId() + ", id: " + markerHashMap.get(m));
-//        ShowMarkerDetailsDialogFragment f;//= (ShowMarkerDetailsDialogFragment)view.getFragmentManager2().findFragmentByTag("dialog1");
-//        f = ShowMarkerDetailsDialogFragment.newInstance(markerHashMap.get(m), m.getTitle());
-//        f.show(view.getFragmentManager2(),"dialog1");
 
 
+        view.getMainActivity().presenter.animateToolbarMargin(0);
         view.getMainActivity().putMarkerInfoFragment(markerHashMap.get(m), m.getTitle());
-        //view.getMainActivity().setToolbarVisible(false);
-
 
 
         return true;
@@ -88,13 +89,13 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void loadMarkersLocal(final LatLngBounds latLngBounds){
 
-        ArrayList<SQLMethods.MarkerOptionsSpec> localSaves = SQLMethods.getMarkers(db,latLngBounds);
+        ArrayList<SQLMethods.MarkerOptionsTuple> localSaves = SQLMethods.getMarkers(db,latLngBounds);
 
         //markerOptionsHashMapLocal.clear();
 
         Log.e("MapsPresenter", localSaves.size() + " localsaves");
 
-        for(SQLMethods.MarkerOptionsSpec mo: localSaves){
+        for(SQLMethods.MarkerOptionsTuple mo: localSaves){
             Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
             markerOptionsHashMapLocal.put(mo.marker,mo.id);
         }
@@ -190,6 +191,24 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         googleMap = gm;
 
         googleMap.setOnMarkerClickListener(this);
+
+        if (ContextCompat.checkSelfPermission(this.view.getMainActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.view.getMainActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.setMyLocationEnabled(true);
+
+        } else {
+            ActivityCompat.requestPermissions(this.view.getMainActivity(), new String[] {
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION },
+                    1);
+        }
+
+
+
 
         view.getMainActivity().replaceSearchBarText();
 
