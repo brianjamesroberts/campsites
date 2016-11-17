@@ -4,6 +4,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.unfairtools.campsites.MainActivity;
+import com.unfairtools.campsites.Adapters.MarkerInfoCardAdapter;
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMarkerInfoFragmentComponent;
@@ -46,8 +50,21 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
 
     public void takeInfo(MarkerInfoObject inf){
 
-        ((ProgressBar)getView().findViewById(R.id.progress_bar_marker_info)).setVisibility(View.GONE);
-        ((TextView)getView().findViewById(R.id.title_text_marker_info)).setText(inf.description);
+
+        RecyclerView recyclerView = ((RecyclerView)getView().findViewById(R.id.marker_info_recycler_view));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+        MarkerInfoCardAdapter adapter = new MarkerInfoCardAdapter(inf,getContext());
+        recyclerView.setAdapter(adapter);
+
+
 
     }
 
@@ -114,6 +131,8 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+
         return inflater.inflate(R.layout.fragment_location_details, container, false);
     }
 

@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.contracts.MainContract;
+import com.unfairtools.campsites.ui.MainActivity;
 
 /**
  * Created by brianroberts on 11/15/16.
@@ -24,8 +25,10 @@ public class MainActivityPresenter implements MainContract.Presenter {
         Log.e("MainActPresenter","AnimateToolBarMargin: " + margin);
         final FrameLayout tb = view.getToolbarFrameLayout();
 
-
-
+        if(margin==0)
+            view.getToolbarEditText().setTextSize(18);
+        else
+            view.getToolbarEditText().setTextSize(16);
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)tb.getLayoutParams();
         ValueAnimator animator = ValueAnimator.ofInt(params.topMargin, margin);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -38,7 +41,7 @@ public class MainActivityPresenter implements MainContract.Presenter {
                 tb.requestLayout();
             }
         });
-        animator.setDuration(500);
+        animator.setDuration(MainActivity.ToolbarAnimationTimeMS);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.start();
 

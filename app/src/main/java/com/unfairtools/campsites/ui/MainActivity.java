@@ -1,4 +1,4 @@
-package com.unfairtools.campsites;
+package com.unfairtools.campsites.ui;
 
 
 import android.database.sqlite.SQLiteDatabase;
@@ -22,14 +22,13 @@ import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 
+import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMainViewComponent;
 import com.unfairtools.campsites.dagger.module.MainViewModule;
 import com.unfairtools.campsites.presenters.MainActivityPresenter;
 import com.unfairtools.campsites.contracts.MainContract;
 
-import com.unfairtools.campsites.ui.LocationDetailsFragment;
-import com.unfairtools.campsites.ui.MapFragment;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import javax.inject.Inject;
@@ -39,6 +38,7 @@ public class MainActivity extends AppCompatActivity
          LocationDetailsFragment.OnFragmentInteractionListener, MainContract.View {
 
             public static int ToolbarMargin = 30;
+            public static int ToolbarAnimationTimeMS = 250;
 
             @Inject
             public MainActivityPresenter presenter;
@@ -51,6 +51,10 @@ public class MainActivity extends AppCompatActivity
             private DrawerLayout drawer;
             private String searchBarText = new String();
 
+
+            public AutoCompleteTextView getToolbarEditText(){
+                return (AutoCompleteTextView)toolbar.findViewById(R.id.main_search_bar);
+            }
 
             public FrameLayout getToolbarFrameLayout(){
                 return (FrameLayout) findViewById(R.id.searchbar_framelayout);
@@ -228,8 +232,6 @@ public class MainActivity extends AppCompatActivity
                 Log.e("Main Activity","Back pressed");
                 this.finish();
             }
-
-
 
     }
 

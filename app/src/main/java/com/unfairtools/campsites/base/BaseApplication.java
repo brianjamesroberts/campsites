@@ -6,6 +6,7 @@ import com.unfairtools.campsites.dagger.component.DaggerServicesComponent;
 import com.unfairtools.campsites.dagger.component.ServicesComponent;
 import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
+import com.unfairtools.campsites.util.LoginManager;
 
 
 /**
@@ -18,7 +19,15 @@ public class BaseApplication extends Application {
 
     private ServicesComponent servicesComponent;
 
+    private static LoginManager loginManager;
+
+
+    public LoginManager getLoginManager(){
+        return loginManager;
+    }
     public void onCreate(){
+
+        loginManager = new LoginManager(this);
 
         servicesComponent =
                 DaggerServicesComponent.builder()

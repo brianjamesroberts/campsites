@@ -1,6 +1,6 @@
 package com.unfairtools.campsites.dagger.component;
 
-import com.unfairtools.campsites.MainActivity;
+import com.unfairtools.campsites.ui.MainActivity;
 import com.unfairtools.campsites.dagger.module.MainViewModule;
 
 import javax.inject.Singleton;

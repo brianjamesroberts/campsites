@@ -14,7 +14,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
-import com.unfairtools.campsites.MainActivity;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.dagger.component.DaggerMapsComponent;
 import com.unfairtools.campsites.dagger.module.MapsModule;
