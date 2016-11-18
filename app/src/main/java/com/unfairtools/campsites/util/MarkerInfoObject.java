@@ -13,12 +13,12 @@ public class MarkerInfoObject {
     public String season;
     public String facilities;
     public String address;
-
+    public boolean isLocal;
     public MarkerInfoObject(){
 
     }
 
-    public MarkerInfoObject(int id, String des, String web, String ph, String goog, String seas, String facil, String address){
+    public MarkerInfoObject(int id, String des, String web, String ph, String goog, String seas, String facil, String address, boolean local){
         this.id_primary_key = id;
         this.description = des;
         this.website = web;
@@ -27,5 +27,6 @@ public class MarkerInfoObject {
         this.season = seas;
         this.facilities = facil;
         this.address = address;
+        this.isLocal = local;
     }
 }

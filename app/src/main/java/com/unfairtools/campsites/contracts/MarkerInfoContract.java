@@ -13,7 +13,7 @@ public interface MarkerInfoContract {
 
     interface View extends BaseView<MarkerInfoContract.Presenter> {
 
-        void takeInfo(MarkerInfoObject info);
+        void takeInfo(MarkerInfoObject info, InfoObject inf);
         void takePrelimInfo(InfoObject info);
 
     }
@@ -24,7 +24,7 @@ public interface MarkerInfoContract {
 
         boolean acceptRating(int rating, int id);
 
-        public void setMarkerIdAndName(int idd);
+        public void setMarkerIdAndName(InfoObject inf);
 
 
     }

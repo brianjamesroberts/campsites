@@ -74,12 +74,12 @@ public class MainActivity extends AppCompatActivity
 
 
 
-            public void putMarkerInfoFragment(int id, String name){
+            public void putMarkerInfoFragment(int id, String name, int type, double latPoint, double longPoint ){
                 Log.e("MainActivity", "Replacing map fragment with markerInfoFragment");
                 FragmentManager fm = getSupportFragmentManager();
                 Fragment locationDetailsFragment = fm.findFragmentByTag("marker_info_fragment");
                 if (locationDetailsFragment == null) {
-                    locationDetailsFragment = LocationDetailsFragment.newInstance(id);
+                    locationDetailsFragment = LocationDetailsFragment.newInstance(id,name,type,latPoint,longPoint);
                 }
 
 
@@ -125,6 +125,10 @@ public class MainActivity extends AppCompatActivity
                 .addToBackStack("map_fragment").commit();
     }
 
+
+    public void refreshMap(){
+        ((MapFragment)getSupportFragmentManager().findFragmentByTag("map_container")).presenter.refreshPoints();
+    }
 
 
     @Override

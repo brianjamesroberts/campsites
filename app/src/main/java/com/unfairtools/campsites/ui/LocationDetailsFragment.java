@@ -48,7 +48,7 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
 
 
 
-    public void takeInfo(MarkerInfoObject inf){
+    public void takeInfo(MarkerInfoObject inf, InfoObject infoObject){
 
 
         RecyclerView recyclerView = ((RecyclerView)getView().findViewById(R.id.marker_info_recycler_view));
@@ -61,11 +61,17 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        MarkerInfoCardAdapter adapter = new MarkerInfoCardAdapter(inf,getContext());
+        MarkerInfoCardAdapter adapter = new MarkerInfoCardAdapter(inf, infoObject,getContext(),this);
         recyclerView.setAdapter(adapter);
 
+        Log.e("LocationDetailsFragment", "INFOOBJECT RECVD: id " + infoObject.ids[0]);
 
 
+
+    }
+
+    public void refreshMap(){
+        getMainActivity().refreshMap();
     }
 
     public void takePrelimInfo(InfoObject inf){
@@ -90,10 +96,15 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
     }
 
 
-    public static LocationDetailsFragment newInstance(Integer id) {
+    public static LocationDetailsFragment newInstance(Integer id, String name,Integer type,double latPoint,double longPoint) {
         LocationDetailsFragment fragment = new LocationDetailsFragment();
         Bundle args = new Bundle();
         args.putInt("id",id);
+        args.putString("name",name);
+        args.putInt("type",type);
+        args.putDouble("latPoint", latPoint);
+        args.putDouble("longPoint", longPoint);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -116,15 +127,31 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
 
     @Override public void onViewCreated(View view, Bundle savedInstanceState) {
         int id = -1;
+        double latPoint = -1f;
+        double longPoint = -1f;
+        Integer type = 0;
+        String name = "";
+
         if (getArguments() != null) {
             id = getArguments().getInt("id");
+            latPoint = getArguments().getDouble("latPoint");
+            longPoint = getArguments().getDouble("longPoint");
+            type = getArguments().getInt("type");
+            name = getArguments().getString("name");
         }
 
+
+        InfoObject inf = new InfoObject();
+        inf.latPoint = latPoint;
+        inf.ids = new int[]{id};
+        inf.longPoint = longPoint;
+        inf.name = name;
+        inf.types = new int[]{type};
         DaggerMarkerInfoFragmentComponent.builder()
                 .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication) getActivity().getApplication()))
                 .build()
                 .inject(this);
-        presenter.setMarkerIdAndName(id);
+        presenter.setMarkerIdAndName(inf);
     }
 
     @Override

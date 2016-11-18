@@ -70,7 +70,7 @@ public class RealmModule {
                     })
                     .build();
 
-
+            Log.e("RealmModule", "New realm module");
             retrofit = new Retrofit.Builder()
                     .baseUrl("https://158.69.207.153/campsites/api/")
                     .client(client)

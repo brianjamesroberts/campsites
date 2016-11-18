@@ -30,7 +30,7 @@ public class MapFragment extends SupportMapFragment implements MapsContract.View
 
 
     @Inject
-    MapsPresenter presenter;
+    public MapsPresenter presenter;
 
     @Inject
     SQLiteDatabase db;

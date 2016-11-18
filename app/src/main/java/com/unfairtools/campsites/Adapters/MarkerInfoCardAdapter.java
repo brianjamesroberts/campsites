@@ -2,9 +2,10 @@ package com.unfairtools.campsites.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
 import com.unfairtools.campsites.R;
+import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
+import com.unfairtools.campsites.ui.LocationDetailsFragment;
+import com.unfairtools.campsites.util.InfoObject;
+import com.unfairtools.campsites.util.LoginManager;
 import com.unfairtools.campsites.util.MarkerInfoObject;
+import com.unfairtools.campsites.util.SQLMethods;
+
+import javax.inject.Inject;
 
 /**
  * Created by brianroberts on 11/16/16.
@@ -24,9 +32,37 @@ import com.unfairtools.campsites.util.MarkerInfoObject;
 
 public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAdapter.MarkerCardViewHolder> {
 
+    @Inject
+    public SQLiteDatabase db;
+
+    @Inject
+    public LoginManager lm;
+
+
     public Context context;
+    private InfoObject markerInfo;
+    private MarkerInfoObject info;
+    private LocationDetailsFragment locationDetailsFragment;
+
+    public MarkerInfoCardAdapter(MarkerInfoObject incInfoMarkerObject, InfoObject incInfoObject, Context c, LocationDetailsFragment frag){
+        this.context = c;
+        this.info = incInfoMarkerObject;
+        this.markerInfo = incInfoObject;
+        this.locationDetailsFragment = frag;
+
+        ((BaseApplication)context.getApplicationContext()).getServicesComponent().inject(this);
+
+    }
 
     public void onBindViewHolder(MarkerInfoCardAdapter.MarkerCardViewHolder viewHolder, int index){
+
+        MarkerInfoObject markerInfoObject = SQLMethods.getMarkerInfoLocal(info.id_primary_key, db);
+
+        boolean hasMarkerLocal = false;
+
+        if(markerInfoObject!=null)
+            hasMarkerLocal = true;
+
 
         viewHolder.description.setVisibility(View.GONE);
         viewHolder.description.setText("");
@@ -34,11 +70,33 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         viewHolder.progressBar.setVisibility(View.GONE);
         viewHolder.addressTextView.setVisibility(View.GONE);
         viewHolder.buttonLayout.setVisibility(View.GONE);
+        viewHolder.switchCompat.setVisibility(View.GONE);
         MarkerCardViewHolder.ViewType enumIndex = MarkerCardViewHolder.ViewType.values()[index];
         if(enumIndex == MarkerCardViewHolder.ViewType.TYPE_DESCRIPTION) {
             Log.e("MarkerInfCardAdap","Making descrption visible");
             viewHolder.description.setVisibility(View.VISIBLE);
             viewHolder.description.setText(info.description);
+            viewHolder.switchCompat.setVisibility(View.VISIBLE);
+            if(hasMarkerLocal)
+                viewHolder.switchCompat.setChecked(true);
+            else
+                viewHolder.switchCompat.setChecked(false);
+            viewHolder.switchCompat.setOnClickListener(new SwitchCompat.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    SwitchCompat s = (SwitchCompat)view;
+                    if(s.isChecked()){
+                        SQLMethods.addLocationLocal(db,MarkerInfoCardAdapter.this.markerInfo);
+                        SQLMethods.addLocationInfoLocal(db,MarkerInfoCardAdapter.this.info);
+                        MarkerInfoCardAdapter.this.locationDetailsFragment.refreshMap();
+                        Log.e("Adapter","Saving local " + info.id_primary_key);
+                    }else{
+                        SQLMethods.deleteLocationLocal(db,markerInfo.ids[0]);
+                        MarkerInfoCardAdapter.this.locationDetailsFragment.refreshMap();
+                        Log.e("Adapter","Don't save local " + info.id_primary_key);
+                    }
+                }
+            });
         }else if(enumIndex== MarkerCardViewHolder.ViewType.TYPE_RATING_COMMENTS){
             viewHolder.ratingBar.setVisibility(View.VISIBLE);
         }else if(enumIndex==MarkerCardViewHolder.ViewType.TYPE_ADDRESS){
@@ -66,17 +124,12 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         }
     }
 
-    private MarkerInfoObject info;
 
 
     public void setInfo(MarkerInfoObject in){
         this.info = in;
     }
 
-    public MarkerInfoCardAdapter(MarkerInfoObject inc, Context c){
-        this.context = c;
-        this.info = inc;
-    }
 
     @Override
     public int getItemCount(){
@@ -96,6 +149,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
 
     public static class MarkerCardViewHolder extends RecyclerView.ViewHolder{
 
+        SwitchCompat switchCompat;
         TextView description;
         RatingBar ratingBar;
         ProgressBar progressBar;
@@ -113,6 +167,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
             addressTextView = (TextView)itemView.findViewById(R.id.card_view_address_text);
             buttonLayout = (LinearLayout)itemView.findViewById(R.id.web_button_layout);
             webButton = (AppCompatImageButton)itemView.findViewById(R.id.web_button);
+            switchCompat = (SwitchCompat) itemView.findViewById(R.id.switchCompat);
             googleButton = (AppCompatImageButton) itemView.findViewById(R.id.google_button);
         }
 
@@ -122,10 +177,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
             TYPE_ADDRESS,
             TYPE_WEBSITES,
             TYPE_TILES,
-            TYPE_RATING_COMMENTS,
-
-
-
+            TYPE_RATING_COMMENTS
         }
 
     }

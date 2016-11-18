@@ -10,6 +10,8 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -17,6 +19,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.gson.Gson;
+import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.contracts.MapsContract;
 import com.unfairtools.campsites.util.ApiService;
@@ -54,10 +57,12 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     private GoogleMap googleMap;
 
+    BitmapDescriptor icon;
 
     public MapsPresenter(MapsContract.View v, BaseApplication b){
         view = v;
         baseApp = b;
+        icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_map_marker);
         b.getServicesComponent().inject(this);
         init();
         log("presenter created");
@@ -78,7 +83,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
 
         view.getMainActivity().presenter.animateToolbarMargin(0);
-        view.getMainActivity().putMarkerInfoFragment(markerHashMap.get(m), m.getTitle());
+        view.getMainActivity().putMarkerInfoFragment(markerHashMap.get(m), m.getTitle(),0,
+                m.getPosition().latitude,m.getPosition().longitude);
 
 
         return true;
@@ -95,7 +101,11 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         Log.e("MapsPresenter", localSaves.size() + " localsaves");
 
+
+
         for(SQLMethods.MarkerOptionsTuple mo: localSaves){
+
+            mo.marker.icon(icon);
             Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
             markerOptionsHashMapLocal.put(mo.marker,mo.id);
         }
@@ -117,16 +127,18 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 inf.longEast = latLngBounds.northeast.longitude;
                 inf.latSouth = latLngBounds.southwest.latitude;
                 inf.longWest = latLngBounds.southwest.longitude;
+                Log.e("MapsPresenter", "apisvc: " + apiService.toString());
                 Call<InfoObject> call = apiService.postBoundsForMarkers(inf);
                 Log.e("MapsPresenter","Requesting markers");
                 call.enqueue(new Callback<InfoObject>(){
                     @Override
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
                         try {
+                            Log.e("MapsPresenter", "Response received");
 
                             Gson gson = new Gson();
                             String json = gson.toJson(response.body());
-                            System.out.println(json);
+                            Log.e("MapsPresenter","json: " + json);
 
                             if(response.isSuccessful()) {
                                 InfoObject inf = response.body();
@@ -212,13 +224,16 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         view.getMainActivity().replaceSearchBarText();
 
-        db.beginTransaction();
-        SQLMethods.addLocation(db,0,48.0356029f,-123.424074f,"Heart O the Hills Campground",0);
+        InfoObject inf = new InfoObject();
+        inf.name = "Heart O the Hills Campground";
+        inf.ids = new int[]{0};
+        inf.latPoint = 48.0356029d;
+        inf.longPoint = -123.424074d;
+        inf.types = new int[]{0};
+        SQLMethods.addLocationLocal(db,inf);
         MarkerInfoObject obj = new MarkerInfoObject();
         obj.id_primary_key = 0; obj.description = "The beautiful Heart O' the Hills Campground";
-        SQLMethods.addLocationInfo(db,obj);
-        db.setTransactionSuccessful();
-        db.endTransaction();
+        SQLMethods.addLocationInfoLocal(db,obj);
         LatLng lat = new LatLng(47.51f,-122.35f);
 
         LatLng lat2 = SQLMethods.getMapLocationLatLng(db);
@@ -234,10 +249,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
             public void onCameraIdle() {
 
                 SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
-                markerHashMap.clear();
-                googleMap.clear();
-                loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
-                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
+                initPoints();
             }
         });
 
@@ -265,8 +277,21 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     }
 
 
+    public void refreshPoints(){
+        googleMap.clear();
+        markerOptionsHashMap.clear();
+        markerOptionsHashMapLocal.clear();
+        initPoints();
+    }
 
-    public void initPoints(){};
+
+    public void initPoints(){
+        Log.e("MapsPresenter", "Init points!");
+        markerHashMap.clear();
+        googleMap.clear();
+        loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
+        loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
+    };
 
     public void showInfo(SupportMapFragment mapFragment){
         //mapFragment.getActivity().makeDialog()

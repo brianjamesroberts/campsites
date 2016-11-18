@@ -42,14 +42,6 @@ public class SQLMethods {
             resultSet.moveToFirst();
             returnObj = new MarkerInfoObject();
 
-//            + SQLMethods.Constants.LocationsInfoTable.id_primary_key + " INTEGER PRIMARY KEY,"
-//                    + SQLMethods.Constants.LocationsInfoTable.description + " VARCHAR,"
-//                    + SQLMethods.Constants.LocationsInfoTable.website + " VARCHAR,"
-//                    + SQLMethods.Constants.LocationsInfoTable.phone + " VARCHAR,"
-//                    + SQLMethods.Constants.LocationsInfoTable.google_url + " VARCHAR,"
-//                    + SQLMethods.Constants.LocationsInfoTable.season + " VARCHAR,"
-//                    + SQLMethods.Constants.LocationsInfoTable.facilities + " VARCHAR"
-//            retLatLng = new LatLng(resultSet.getDouble(1),resultSet.getDouble(2));
             returnObj.id_primary_key = resultSet.getInt(0);
             returnObj.description = resultSet.getString(1);
             returnObj.website = resultSet.getString(2);
@@ -148,6 +140,30 @@ public class SQLMethods {
 
     }
 
+    public static void putLastAuthKey(SQLiteDatabase db, String key){
+
+    }
+    public static String getLastAuthKey(SQLiteDatabase db){
+        Cursor resultSet = null;
+        try {
+            String query = "SELECT * FROM " + Constants.LOGIN_TABLE_NAME
+                    + " WHERE " + Constants.LoginTable.id_primary_key + " = '0';";
+            resultSet = db.rawQuery(query, null);
+            if (resultSet == null)
+                return null;
+            if (resultSet.getCount() < 1) {
+                return null;
+            }
+            resultSet.moveToFirst();
+            return resultSet.getString(1);
+        }finally{
+            if(resultSet!=null)
+                resultSet.close();
+        }
+    }
+
+
+
     public static ArrayList<MarkerOptionsTuple>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
         ArrayList<MarkerOptionsTuple> returnMarkers = new ArrayList<MarkerOptionsTuple>();
 
@@ -171,6 +187,7 @@ public class SQLMethods {
                 resultSet.moveToFirst();
 
             Integer mInt = resultSet.getInt(0);
+            String snip = "" + resultSet.getInt(4);
             LatLng latLng = new LatLng(resultSet.getFloat(1), resultSet.getFloat(2));
             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(resultSet.getString(3));
             MarkerOptionsTuple mSpec = new MarkerOptionsTuple();
@@ -187,7 +204,8 @@ public class SQLMethods {
 
     }
 
-    public static void addLocationInfo(SQLiteDatabase db, MarkerInfoObject object){
+    public static void addLocationInfoLocal(SQLiteDatabase db, MarkerInfoObject object){
+        db.beginTransaction();
         if(!SQLMethods.existsRecord(Constants.LOCATIONS_INFO_TABLE_NAME,Constants.LocationsInfoTable.id_primary_key,object.id_primary_key +"",db)) {
             ContentValues args = new ContentValues();
             args.put(Constants.LocationsInfoTable.id_primary_key, object.id_primary_key);
@@ -199,18 +217,37 @@ public class SQLMethods {
             args.put(Constants.LocationsInfoTable.facilities,object.facilities);
             db.insert(Constants.LOCATIONS_INFO_TABLE_NAME,null, args);
         }
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
-    public static void addLocation(SQLiteDatabase db, int id, float lat, float longitude, String name, int type){
-        if(!SQLMethods.existsRecord(Constants.LOCATIONS_TABLE_NAME,Constants.LocationsTable.id_primary_key,id +"",db)) {
+    public static void addLocationLocal(SQLiteDatabase db, InfoObject infoObject){
+        db.beginTransaction();
+        if(!SQLMethods.existsRecord(Constants.LOCATIONS_TABLE_NAME,Constants.LocationsTable.id_primary_key,infoObject.ids[0] +"",db)) {
             ContentValues args = new ContentValues();
-            args.put(Constants.LocationsTable.id_primary_key, id);
-            args.put(Constants.LocationsTable.latitude, lat);
-            args.put(Constants.LocationsTable.longitude, longitude);
-            args.put(Constants.LocationsTable.name, name);
-            args.put(Constants.LocationsTable.type, type);
+            args.put(Constants.LocationsTable.id_primary_key, infoObject.ids[0]);
+            args.put(Constants.LocationsTable.latitude, infoObject.latPoint);
+            args.put(Constants.LocationsTable.longitude, infoObject.longPoint);
+            args.put(Constants.LocationsTable.name, infoObject.name);
             db.insert(Constants.LOCATIONS_TABLE_NAME, null, args);//, Constants.LocationsTable.id_primary_key + " = '" + id + "'", null);
         }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+
+
+    public static void deleteLocationLocal(SQLiteDatabase db, int id){
+        String query1 = "DELETE FROM " + Constants.LOCATIONS_TABLE_NAME + " WHERE "
+                + Constants.LocationsTable.id_primary_key + " = " + id + ";";
+        String query2 = "DELETE FROM " + Constants.LOCATIONS_INFO_TABLE_NAME + " WHERE "
+                + Constants.LocationsInfoTable.id_primary_key + " = " + id + ";";
+
+        db.beginTransaction();
+        db.execSQL(query1);
+        db.execSQL(query2);
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     public class Constants{
@@ -241,6 +278,12 @@ public class SQLMethods {
             public final static String google_url = "google_url";
             public final static String season = "season";
             public final static String facilities = "facilities";
+        }
+
+        public final static String LOGIN_TABLE_NAME = "LOGIN_TABLE";
+        public class LoginTable{
+            public final static String id_primary_key = "id";
+            public final static String key = "key";
         }
 
     }
@@ -289,6 +332,29 @@ public class SQLMethods {
     }
 
     public static void initDatabaseCheck(SQLiteDatabase db){
+
+        if(!SQLMethods.doesTableExist(db, Constants.LOGIN_TABLE_NAME)) {
+            db.beginTransaction();
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " +
+                            Constants.LOGIN_TABLE_NAME +
+                            "("
+                            + Constants.LoginTable.id_primary_key + " INTEGER PRIMARY KEY,"
+                            + Constants.LoginTable.key + " INTEGER"
+                            + ");");
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            db.beginTransaction();
+            ContentValues args = new ContentValues();
+            args.put(SQLMethods.Constants.LoginTable.id_primary_key, 0);
+            args.put(Constants.LoginTable.key, "n/a");
+            db.insert(Constants.LOGIN_TABLE_NAME, null, args);
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+
         if(!SQLMethods.doesTableExist(db,SQLMethods.Constants.LOCATIONS_TABLE_NAME)){
             Log.e("MainActivity","Creating table " + SQLMethods.Constants.LOCATIONS_TABLE_NAME);
             db.beginTransaction();

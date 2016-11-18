@@ -33,8 +33,7 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
     MarkerInfoContract.View view;
     BaseApplication baseApplication;
 
-    private int id;
-    private String name;
+    InfoObject myInfo;
 
 
     public MarkerInfoFragmentPresenter(MarkerInfoContract.View v, BaseApplication b){
@@ -43,17 +42,17 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
         b.getServicesComponent().inject(this);
     }
 
-    public void setMarkerIdAndName(int idd){
-        this.id = idd;
-        //this.name = namee;
-        InfoObject inf = new InfoObject();
-        //inf.name = this.name;
-        inf.ids = new int[]{this.id};
+    public void setMarkerIdAndName(InfoObject inf){
+        this.myInfo = new InfoObject();
+        this.myInfo.ids = new int[]{inf.ids[0]};
+        this.myInfo.name = inf.name;
+        this.myInfo.latPoint = inf.latPoint;
+        this.myInfo.longPoint = inf.longPoint;
+        this.myInfo.types = inf.types;
+
         view.takePrelimInfo(inf);
 
-
         makeItRainOnDemBitches();
-
 
 
     }
@@ -64,14 +63,14 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
 
     public void makeItRainOnDemBitches(){
 
-        MarkerInfoObject markerInfoObject = SQLMethods.getMarkerInfoLocal(MarkerInfoFragmentPresenter.this.id, db);
+        MarkerInfoObject markerInfoObject = SQLMethods.getMarkerInfoLocal(MarkerInfoFragmentPresenter.this.myInfo.ids[0], db);
 
         if(markerInfoObject==null) {
             Log.e("MarkerInfFragPres","markerInfoObject: null");
             new Thread() {
                 public void run() {
                     InfoObject inf = new InfoObject();
-                    inf.ids = new int[]{MarkerInfoFragmentPresenter.this.id};
+                    inf.ids = new int[]{MarkerInfoFragmentPresenter.this.myInfo.ids[0]};
                     Call<MarkerInfoObject> call = apiService.postIdForMarkerInfo(inf);
                     call.enqueue(new Callback<MarkerInfoObject>() {
                         @Override
@@ -85,7 +84,7 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
                                     System.out.println("descrption: " + inf.description);
                                     if (response.body().description != null) {
                                         System.out.println(response.body().description);
-                                        view.takeInfo(response.body());
+                                        view.takeInfo(response.body(),myInfo);
                                     }
                                 }
                             } catch (Exception e) {
@@ -102,7 +101,7 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
             }.start();
         }else{
             Log.e("MarkerInfFragPres",markerInfoObject.toString());
-            view.takeInfo(markerInfoObject);
+            view.takeInfo(markerInfoObject,myInfo);
         }
     }
 
