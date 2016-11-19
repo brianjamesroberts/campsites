@@ -114,6 +114,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(Intent.ACTION_VIEW);
+                    Log.e("MICAdapter","google_url: " + info.google_url);
                     i.setData(Uri.parse(info.google_url));
                     context.startActivity(i);
 
