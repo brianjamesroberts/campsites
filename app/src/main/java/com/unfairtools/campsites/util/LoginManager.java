@@ -3,9 +3,13 @@ package com.unfairtools.campsites.util;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
 
 import javax.inject.Inject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * Created by brianroberts on 11/16/16.
@@ -13,7 +17,7 @@ import javax.inject.Inject;
 
 public class LoginManager {
 
-    BaseApplication baseApplication;
+    //private BaseApplication baseApplication;
 
     private boolean loggedIn = false;
 
@@ -25,23 +29,101 @@ public class LoginManager {
 
 
     private String authKey;
+    private String username;
+    private String password;
 
     public LoginManager(BaseApplication base){
 
         Log.e("LoginManager", "New login manager");
 
-        this.baseApplication = base;
+        //this.baseApplication = base;
         base.getServicesComponent().inject(this);
 
-        this.authKey = SQLMethods.getLastAuthKey(db);
-        Log.e("LoginManager", "Last AuthKey: " + this.authKey);
+        getStoredAuth();
 
         if(!loggedIn())
             tryLogin();
 
+        newLogin("brian", "password", new OnLoggedInCallback() {
+
+            @Override
+            public void onFinish() {
+                InfoObject inf = this.getResult();
+                Log.e("LoginManager", "Login received " + new Gson().toJson(inf));
+            }
+        });
+
+//        if(loggedIn)
+//            beginRefreshLogin();
     }
 
-    private void putLastAuthKey(String key){
+
+    public static class Constants{
+        public final static int LOGIN_DENIED=1;
+        public final static int LOGIN_SUCCESS=2;
+    }
+
+    public void newLogin(final String username, final String password, final OnLoggedInCallback cb) {
+        Call<InfoObject> call = apiService.postLogin(username,password);
+        Log.e("LoginManager","newLogin called");
+        call.enqueue(new Callback<InfoObject>(){
+            @Override
+            public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
+                InfoObject infResult = new InfoObject();
+                try {
+                    infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                    Log.e("Incmoing json login: ", new Gson().toJson(response.body()));
+                    infResult.name = "OnResponse: Success, didn't parse json properly!";
+                    Log.e("MapsPresenter", "Response received");
+                    Gson gson = new Gson();
+                    String json = gson.toJson(response.body());
+                    Log.e("MapsPresenter","json: " + json);
+                    if(response.isSuccessful()) {
+                        InfoObject inf = response.body();
+                        System.out.println(inf.names);
+                        if(response.body().names!=null) {
+                            infResult.ids = new int[]{Constants.LOGIN_SUCCESS};
+                            infResult.names= response.body().names;
+                            infResult.authKey = response.body().authKey;
+                            if(infResult.authKey!=null && !infResult.authKey.equals("")) {
+                                LoginManager.this.username = username;
+                                LoginManager.this.password = password;
+                                LoginManager.this.loggedIn = true;
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                    infResult.name = e.toString();
+                }
+                cb.setResult(infResult);
+                cb.onFinish();
+            }
+
+            @Override
+            public void onFailure(Call<InfoObject> call, Throwable t) {
+                InfoObject infResult = new InfoObject();
+                infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                infResult.name = "onFailure";
+                cb.setResult(infResult);
+                cb.onFinish();
+                Log.e("resp","failed " + t.toString() + " is executed: " + call.isExecuted());
+            }
+        });
+
+    }
+
+
+
+
+    private void getStoredAuth(){
+        authKey = SQLMethods.getLastAuthKey(db);
+        Log.e("LoginManager","getAuth: " + authKey);
+        putLastAuthKey(55);
+    }
+
+    private void putLastAuthKey(Integer key){
         SQLMethods.putLastAuthKey(db,key);
     }
 
@@ -55,6 +137,7 @@ public class LoginManager {
         InfoObject inf = new InfoObject();
         inf.name = authKey;
         //apiService.postLoginAuth(inf);
+
     }
 
 }

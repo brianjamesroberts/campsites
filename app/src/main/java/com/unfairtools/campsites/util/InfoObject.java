@@ -20,6 +20,8 @@ public class InfoObject {
     public String[] names;
     public int[] types;
 
+    public String authKey;
+
     public String address;
 
 }

@@ -5,6 +5,7 @@ package com.unfairtools.campsites.util;
  */
         import retrofit2.Call;
         import retrofit2.http.Body;
+        import retrofit2.http.Header;
         import retrofit2.http.POST;
 
 /**
@@ -23,8 +24,8 @@ public interface ApiService {
 //    public Call<InfoObject> postLoginAuth(@Body InfoObject info);
 
     //
-//    @POST("login")
-//    public Call<InfoObject> postLogin(@Header("username") String username, @Header("password") String password);
+    @POST("login")
+    public Call<InfoObject> postLogin(@Header("username") String username, @Header("password") String password);
 
 //
 }

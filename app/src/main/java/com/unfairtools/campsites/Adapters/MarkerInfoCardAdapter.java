@@ -56,12 +56,8 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
 
     public void onBindViewHolder(MarkerInfoCardAdapter.MarkerCardViewHolder viewHolder, int index){
 
-        MarkerInfoObject markerInfoObject = SQLMethods.getMarkerInfoLocal(info.id_primary_key, db);
 
-        boolean hasMarkerLocal = false;
 
-        if(markerInfoObject!=null)
-            hasMarkerLocal = true;
 
 
         viewHolder.description.setVisibility(View.GONE);
@@ -73,6 +69,8 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         viewHolder.switchCompat.setVisibility(View.GONE);
         MarkerCardViewHolder.ViewType enumIndex = MarkerCardViewHolder.ViewType.values()[index];
         if(enumIndex == MarkerCardViewHolder.ViewType.TYPE_DESCRIPTION) {
+            boolean hasMarkerLocal = hasMarkerLocal = SQLMethods.existsRecord(SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME,
+                    SQLMethods.Constants.LocationsInfoTable.id_primary_key,info.id_primary_key + "",db);
             Log.e("MarkerInfCardAdap","Making descrption visible");
             viewHolder.description.setVisibility(View.VISIBLE);
             viewHolder.description.setText(info.description);

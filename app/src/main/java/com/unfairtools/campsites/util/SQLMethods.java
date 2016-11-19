@@ -140,7 +140,20 @@ public class SQLMethods {
 
     }
 
-    public static void putLastAuthKey(SQLiteDatabase db, String key){
+    public static void putLastAuthKey(SQLiteDatabase db, Integer key){
+        try {
+            db.beginTransaction();
+                Log.e("SQLMethods","putLastAuthKey: value already existed");
+                ContentValues cv = new ContentValues();
+                cv.put(Constants.LoginTable.id_primary_key,0);
+                cv.put(Constants.LoginTable.key,key);
+                db.update(Constants.LOGIN_TABLE_NAME,cv,Constants.LoginTable.id_primary_key + " = '0'",null);
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            db.endTransaction();
+        }
 
     }
     public static String getLastAuthKey(SQLiteDatabase db){

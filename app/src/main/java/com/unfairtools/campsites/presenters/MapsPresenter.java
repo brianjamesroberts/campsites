@@ -104,12 +104,11 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
 
         for(SQLMethods.MarkerOptionsTuple mo: localSaves){
-
             mo.marker.icon(icon);
             Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
             markerOptionsHashMapLocal.put(mo.marker,mo.id);
         }
-
+        placeMarkersOnMap(googleMap, null);
 
     }
 
@@ -117,7 +116,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     public void loadMarkers(final LatLngBounds latLngBounds){
 
 
-        placeMarkersOnMap(googleMap, null);
+//        placeMarkersOnMap(googleMap, null);
 
 
         new Thread(){
@@ -135,11 +134,9 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
                         try {
                             Log.e("MapsPresenter", "Response received");
-
                             Gson gson = new Gson();
                             String json = gson.toJson(response.body());
                             Log.e("MapsPresenter","json: " + json);
-
                             if(response.isSuccessful()) {
                                 InfoObject inf = response.body();
                                 System.out.println(inf.names);
@@ -177,9 +174,6 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
                 if (!markerOptionsHashMapLocal.containsValue(inf.ids[i])) {
                     markerOptionsHashMap.put(mo, inf.ids[i]);
-                    //Log.e("MapsPresenter", "Adding markeroptions from internet: " + mo.getTitle());
-                } else {
-                    //Log.e("MapsPresenter", "Already contained " + inf.ids[i] + " from local");
                 }
             }
         }
