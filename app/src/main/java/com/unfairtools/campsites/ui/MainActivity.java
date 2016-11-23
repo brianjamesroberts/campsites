@@ -1,6 +1,7 @@
 package com.unfairtools.campsites.ui;
 
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -212,8 +213,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        presenter.notifyViewIsReady();
     }
 
+public Context getViewContext(){
+    return this;
+}
 
             @Override
             public boolean onSupportNavigateUp(){

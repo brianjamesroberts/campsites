@@ -20,6 +20,9 @@ public interface ApiService {
     @POST ("idformarkerinfo")
     Call<MarkerInfoObject> postIdForMarkerInfo(@Body InfoObject info);
 
+    @POST("postforsearchinfo")
+    Call<InfoObject> postForSearchResults(@Body InfoObject info);
+
 //    @POST ("loginauth")
 //    public Call<InfoObject> postLoginAuth(@Body InfoObject info);
 

@@ -37,9 +37,9 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
 
 
     public MarkerInfoFragmentPresenter(MarkerInfoContract.View v, BaseApplication b){
-        view = v;
-        baseApplication = b;
-        b.getServicesComponent().inject(this);
+        this.view = v;
+        this.baseApplication = b;
+        this.baseApplication.getServicesComponent().inject(this);
     }
 
     public void setMarkerIdAndName(InfoObject inf){
@@ -50,7 +50,7 @@ public class MarkerInfoFragmentPresenter implements MarkerInfoContract.Presenter
         this.myInfo.longPoint = inf.longPoint;
         this.myInfo.types = inf.types;
 
-        view.takePrelimInfo(inf);
+        this.view.takePrelimInfo(inf);
 
         makeItRainOnDemBitches();
 

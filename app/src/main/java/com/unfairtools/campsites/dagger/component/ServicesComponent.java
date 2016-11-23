@@ -4,6 +4,7 @@ import com.unfairtools.campsites.Adapters.MarkerInfoCardAdapter;
 import com.unfairtools.campsites.dagger.module.LoginManagerModule;
 import com.unfairtools.campsites.dagger.module.RealmModule;
 import com.unfairtools.campsites.dagger.module.SQLiteModule;
+import com.unfairtools.campsites.presenters.MainActivityPresenter;
 import com.unfairtools.campsites.presenters.MapsPresenter;
 import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
 import com.unfairtools.campsites.util.LoginManager;
@@ -21,9 +22,11 @@ import javax.inject.Singleton;
 
 @Singleton
 public interface ServicesComponent {
+    void inject(MainActivityPresenter presenter);
     void inject(MapsPresenter presenter);
     void inject(MarkerInfoFragmentPresenter presenter);
     void inject(MarkerInfoCardAdapter adapter);
     void inject(LoginManager loginManager);
+
 
 }

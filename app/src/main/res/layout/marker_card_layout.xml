@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:id ="@+id/card_view_parent">
 
 
     <android.support.v7.widget.SwitchCompat
@@ -21,6 +22,33 @@
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="4dp"
         card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/login_layout_card_layout">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/login_layout_card_layout_inner">
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/user_text_card"/>
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pass_text_card"/>
+            </LinearLayout>
+            <Button
+                android:text="Login"
+                android:layout_height="match_parent"
+                android:layout_width = "wrap_content"
+                android:id="@+id/login_button_card"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,7 +93,8 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/progress_bar_marker_info" />
+            android:indeterminate="true"
+            android:id="@+id/card_progress_bar" />
 
     <TextView
         android:layout_width="match_parent"

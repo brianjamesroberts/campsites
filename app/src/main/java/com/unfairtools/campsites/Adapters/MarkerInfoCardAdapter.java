@@ -11,10 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.AppCompatImageButton;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
 import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
@@ -22,6 +26,7 @@ import com.unfairtools.campsites.ui.LocationDetailsFragment;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.LoginManager;
 import com.unfairtools.campsites.util.MarkerInfoObject;
+import com.unfairtools.campsites.util.OnLoggedInCallback;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import javax.inject.Inject;
@@ -50,35 +55,58 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         this.markerInfo = incInfoObject;
         this.locationDetailsFragment = frag;
 
+        Log.e("Context is ", context.toString());
+
         ((BaseApplication)context.getApplicationContext()).getServicesComponent().inject(this);
 
     }
 
-    public void onBindViewHolder(MarkerInfoCardAdapter.MarkerCardViewHolder viewHolder, int index){
+    public void setData(MarkerInfoObject markerInfoObject, InfoObject infoObject){
+        this.markerInfo = infoObject;
+        this.info = markerInfoObject;
+        this.notifyDataSetChanged();
+    }
+
+    public void onBindViewHolder(final MarkerInfoCardAdapter.MarkerCardViewHolder viewHolder, int index){
 
 
-
-
+        viewHolder.selfView.setVisibility(View.VISIBLE);
 
         viewHolder.description.setVisibility(View.GONE);
         viewHolder.description.setText("");
         viewHolder.ratingBar.setVisibility(View.GONE);
-        viewHolder.progressBar.setVisibility(View.GONE);
         viewHolder.addressTextView.setVisibility(View.GONE);
         viewHolder.buttonLayout.setVisibility(View.GONE);
         viewHolder.switchCompat.setVisibility(View.GONE);
+        viewHolder.loginLayout.setVisibility(View.GONE);
+
+        viewHolder.loadingBar.setVisibility(View.GONE);
         MarkerCardViewHolder.ViewType enumIndex = MarkerCardViewHolder.ViewType.values()[index];
+
+        if(info==null) {
+//            if(index!=0) {
+//                viewHolder.selfView.setVisibility(View.GONE);
+//            }else{
+//                viewHolder.loadingBar.setVisibility(View.VISIBLE);
+//            }
+            viewHolder.selfView.setVisibility(View.GONE);
+            return;
+        }
         if(enumIndex == MarkerCardViewHolder.ViewType.TYPE_DESCRIPTION) {
-            boolean hasMarkerLocal = hasMarkerLocal = SQLMethods.existsRecord(SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME,
+            Log.e("DB IS ", db.toString() + ": info.idprimarykey: "+ info.id_primary_key );
+
+            boolean hasMarkerLocal = SQLMethods.existsRecord(SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME,
                     SQLMethods.Constants.LocationsInfoTable.id_primary_key,info.id_primary_key + "",db);
             Log.e("MarkerInfCardAdap","Making descrption visible");
             viewHolder.description.setVisibility(View.VISIBLE);
             viewHolder.description.setText(info.description);
             viewHolder.switchCompat.setVisibility(View.VISIBLE);
-            if(hasMarkerLocal)
+            if(hasMarkerLocal) {
                 viewHolder.switchCompat.setChecked(true);
-            else
+            }
+            else {
                 viewHolder.switchCompat.setChecked(false);
+            }
             viewHolder.switchCompat.setOnClickListener(new SwitchCompat.OnClickListener(){
                 @Override
                 public void onClick(View view) {
@@ -96,7 +124,28 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
                 }
             });
         }else if(enumIndex== MarkerCardViewHolder.ViewType.TYPE_RATING_COMMENTS){
-            viewHolder.ratingBar.setVisibility(View.VISIBLE);
+
+                    if(MarkerInfoCardAdapter.this.lm.isLoggedIn()){
+                        viewHolder.ratingBar.setVisibility(View.VISIBLE);
+                    }else{
+                        viewHolder.loginLayout.setVisibility(View.VISIBLE);
+                        viewHolder.loginButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                lm.newLogin(viewHolder.userText.getText().toString(), viewHolder.passText.getText().toString(),
+                                        new OnLoggedInCallback() {
+                                            @Override
+                                            public void onFinish() {
+                                                InfoObject inf = this.result;
+                                                Log.e("LoginManager", "Login received " + new Gson().toJson(inf));
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                            }
+                        });
+                    }
+
+
         }else if(enumIndex==MarkerCardViewHolder.ViewType.TYPE_ADDRESS){
             viewHolder.addressTextView.setVisibility(View.VISIBLE);
             viewHolder.addressTextView.setText(info.address);
@@ -151,23 +200,36 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         SwitchCompat switchCompat;
         TextView description;
         RatingBar ratingBar;
-        ProgressBar progressBar;
         TextView addressTextView;
+        LinearLayout loginLayout;
 
         LinearLayout buttonLayout;
         AppCompatImageButton webButton;
         AppCompatImageButton googleButton;
 
+        EditText userText;
+        EditText passText;
+        Button loginButton;
+
+        LinearLayout selfView;
+
+        ProgressBar loadingBar;
+
         public MarkerCardViewHolder(View itemView) {
             super(itemView);
+            loginLayout = (LinearLayout)itemView.findViewById(R.id.login_layout_card_layout);
             description = (TextView)itemView.findViewById(R.id.card_view_description_text);
             ratingBar = (RatingBar)itemView.findViewById(R.id.ratingBar);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar_marker_info);
             addressTextView = (TextView)itemView.findViewById(R.id.card_view_address_text);
             buttonLayout = (LinearLayout)itemView.findViewById(R.id.web_button_layout);
             webButton = (AppCompatImageButton)itemView.findViewById(R.id.web_button);
             switchCompat = (SwitchCompat) itemView.findViewById(R.id.switchCompat);
             googleButton = (AppCompatImageButton) itemView.findViewById(R.id.google_button);
+            loginButton = (Button)itemView.findViewById(R.id.login_button_card);
+            userText = (EditText)itemView.findViewById(R.id.user_text_card);
+            passText = (EditText)itemView.findViewById(R.id.pass_text_card);
+            selfView = (LinearLayout) itemView.findViewById(R.id.card_view_parent);
+            loadingBar = (ProgressBar) itemView.findViewById(R.id.card_progress_bar);
         }
 
 

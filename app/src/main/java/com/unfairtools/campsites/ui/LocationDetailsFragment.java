@@ -47,22 +47,14 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
     MarkerInfoFragmentPresenter presenter;
 
 
+    RecyclerView recyclerView;
+
 
     public void takeInfo(MarkerInfoObject inf, InfoObject infoObject){
 
 
-        RecyclerView recyclerView = ((RecyclerView)getView().findViewById(R.id.marker_info_recycler_view));
+        ((MarkerInfoCardAdapter)recyclerView.getAdapter()).setData(inf,infoObject);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-
-        MarkerInfoCardAdapter adapter = new MarkerInfoCardAdapter(inf, infoObject,getContext(),this);
-        recyclerView.setAdapter(adapter);
 
         Log.e("LocationDetailsFragment", "INFOOBJECT RECVD: id " + infoObject.ids[0]);
 
@@ -132,6 +124,19 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
         Integer type = 0;
         String name = "";
 
+
+
+        recyclerView = ((RecyclerView)getView().findViewById(R.id.marker_info_recycler_view));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        MarkerInfoCardAdapter adapter = new MarkerInfoCardAdapter(null, null, getContext(),this);
+        recyclerView.setAdapter(adapter);
+
         if (getArguments() != null) {
             id = getArguments().getInt("id");
             latPoint = getArguments().getDouble("latPoint");
@@ -151,6 +156,12 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
                 .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication) getActivity().getApplication()))
                 .build()
                 .inject(this);
+//
+//        DaggerMarkerInfoFragmentComponent.builder()
+//                .markerInfoFragmentModule(new MarkerInfoFragmentModule(this, (BaseApplication)getActivity().getApplication()))
+//                .build()
+//                .inject(this);
+//
         presenter.setMarkerIdAndName(inf);
     }
 

@@ -1,5 +1,6 @@
 package com.unfairtools.campsites.contracts;
 
+import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
@@ -17,7 +18,7 @@ public interface MainContract {
 
         public FrameLayout getToolbarFrameLayout();
         public AutoCompleteTextView getToolbarEditText();
-
+        public Context getViewContext();
 
 
     }
@@ -25,6 +26,7 @@ public interface MainContract {
     interface Presenter extends BasePresenter {
 
         public void animateToolbarMargin(int margin);
+        public void notifyViewIsReady();
 
     }
 }

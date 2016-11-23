@@ -44,11 +44,11 @@ public class LoginManager {
         if(!loggedIn())
             tryLogin();
 
-        newLogin("brian", "password", new OnLoggedInCallback() {
+        newLogin("brian", "password1", new OnLoggedInCallback() {
 
             @Override
             public void onFinish() {
-                InfoObject inf = this.getResult();
+                InfoObject inf = this.result;
                 Log.e("LoginManager", "Login received " + new Gson().toJson(inf));
             }
         });
@@ -59,46 +59,53 @@ public class LoginManager {
 
 
     public static class Constants{
-        public final static int LOGIN_DENIED=1;
-        public final static int LOGIN_SUCCESS=2;
+        public final static int LOGIN_DENIED=0;
+        public final static int LOGIN_SUCCESS=1;
+    }
+
+    public boolean isLoggedIn(){
+        return loggedIn;
     }
 
     public void newLogin(final String username, final String password, final OnLoggedInCallback cb) {
-        Call<InfoObject> call = apiService.postLogin(username,password);
+        new Thread(){
+            public void run(){
+            Call<InfoObject> call = apiService.postLogin(username,password);
+
         Log.e("LoginManager","newLogin called");
         call.enqueue(new Callback<InfoObject>(){
             @Override
-            public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
-                InfoObject infResult = new InfoObject();
-                try {
-                    infResult.ids = new int[]{Constants.LOGIN_DENIED};
-                    Log.e("Incmoing json login: ", new Gson().toJson(response.body()));
-                    infResult.name = "OnResponse: Success, didn't parse json properly!";
-                    Log.e("MapsPresenter", "Response received");
-                    Gson gson = new Gson();
-                    String json = gson.toJson(response.body());
-                    Log.e("MapsPresenter","json: " + json);
-                    if(response.isSuccessful()) {
-                        InfoObject inf = response.body();
-                        System.out.println(inf.names);
-                        if(response.body().names!=null) {
-                            infResult.ids = new int[]{Constants.LOGIN_SUCCESS};
-                            infResult.names= response.body().names;
-                            infResult.authKey = response.body().authKey;
-                            if(infResult.authKey!=null && !infResult.authKey.equals("")) {
-                                LoginManager.this.username = username;
-                                LoginManager.this.password = password;
-                                LoginManager.this.loggedIn = true;
+            public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response){
+                    InfoObject infResult = new InfoObject();
+                    try {
+                        infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                        Log.e("Incmoing json login: ", new Gson().toJson(response.body()));
+                        infResult.name = "OnResponse: Success, didn't parse json properly!";
+                        Log.e("MapsPresenter", "Response received");
+                        Gson gson = new Gson();
+                        String json = gson.toJson(response.body());
+                        Log.e("MapsPresenter", "json: " + json);
+                        if (response.isSuccessful()) {
+                            InfoObject inf = response.body();
+                            System.out.println(inf.names);
+                            if (response.body().names != null) {
+                                infResult.ids = new int[]{Constants.LOGIN_SUCCESS};
+                                infResult.names = response.body().names;
+                                infResult.authKey = response.body().authKey;
+                                if (infResult.authKey != null && !infResult.authKey.equals("")) {
+                                    LoginManager.this.username = username;
+                                    LoginManager.this.password = password;
+                                    LoginManager.this.loggedIn = true;
+                                }
                             }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                        infResult.name = e.toString();
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    infResult.ids = new int[]{Constants.LOGIN_DENIED};
-                    infResult.name = e.toString();
-                }
-                cb.setResult(infResult);
-                cb.onFinish();
+                    cb.onFinish();
+
             }
 
             @Override
@@ -106,11 +113,12 @@ public class LoginManager {
                 InfoObject infResult = new InfoObject();
                 infResult.ids = new int[]{Constants.LOGIN_DENIED};
                 infResult.name = "onFailure";
-                cb.setResult(infResult);
                 cb.onFinish();
                 Log.e("resp","failed " + t.toString() + " is executed: " + call.isExecuted());
             }
         });
+            }
+        }.start();
 
     }
 
