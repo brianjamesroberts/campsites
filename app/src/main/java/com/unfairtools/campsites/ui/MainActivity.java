@@ -25,11 +25,13 @@ import android.widget.FrameLayout;
 
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.contracts.MapsContract;
 import com.unfairtools.campsites.dagger.component.DaggerMainViewComponent;
 import com.unfairtools.campsites.dagger.module.MainViewModule;
 import com.unfairtools.campsites.presenters.MainActivityPresenter;
 import com.unfairtools.campsites.contracts.MainContract;
 
+import com.unfairtools.campsites.presenters.MapsPresenter;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import javax.inject.Inject;
@@ -110,6 +112,13 @@ public class MainActivity extends AppCompatActivity
                 ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).setEnabled(true);
                 ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).setText(searchBarText);
             }
+
+    public MapsContract.Presenter getMapsPresenter(){
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment mapFragment = fm.findFragmentByTag("map_container");
+        MapsPresenter pres = ((MapFragment)mapFragment).presenter;
+        return pres;
+    }
 
     public void putMapFragment(){
         FragmentManager fm = getSupportFragmentManager();

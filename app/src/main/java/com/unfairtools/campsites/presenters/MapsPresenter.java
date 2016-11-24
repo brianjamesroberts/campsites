@@ -68,6 +68,11 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         log("presenter created");
     }
 
+    public void sendMapTo(double lat, double longitude){
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, longitude), 9.0f));
+
+    }
+
     public void initZoom(){
 
     };

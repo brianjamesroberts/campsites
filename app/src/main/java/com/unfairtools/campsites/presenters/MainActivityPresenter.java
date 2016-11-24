@@ -101,8 +101,12 @@ public class MainActivityPresenter implements MainContract.Presenter {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 Log.e("Text is", charSequence.toString());
-                if(charSequence.length()<2)
+                if(charSequence.length()<2) {
+                    if(pwindow!=null && pwindow.isShowing()) {
+                        pwindow.dismiss();
+                    }
                     return;
+                }
                 final InfoObject infoObjectInput = new InfoObject();
                 infoObjectInput.name = charSequence.toString();
                 Call<InfoObject> call = apiService.postForSearchResults(infoObjectInput);
@@ -177,11 +181,12 @@ public class MainActivityPresenter implements MainContract.Presenter {
             inf.name = infoObjectInput.names[i];
             inf.latPoint = infoObjectInput.latitudes[i];
             inf.longPoint = infoObjectInput.longitudes[i];
+            inf.ids = new int[]{infoObjectInput.ids[i]};
             results.add(inf);
         }
 
 
-        int popupwindowHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final int popupwindowHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
 
         LayoutInflater layoutInflater = (LayoutInflater) ((Activity)view.getViewContext())
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -219,6 +224,22 @@ public class MainActivityPresenter implements MainContract.Presenter {
             Log.e("MainActPresent", "adding " + results.get(i).name + " to edit texts");
             editTexts[i].setText(results.get(i).name);
             editTexts[i].setVisibility(View.VISIBLE);
+            editTexts[i].setTag(R.string.tag_latitude,results.get(i).latPoint);
+            editTexts[i].setTag(R.string.tag_longitude,results.get(i).longPoint);
+            editTexts[i].setTag(R.string.tag_id,results.get(i).ids[0]);
+            editTexts[i].setTag(R.string.tag_name,results.get(i).name);
+            editTexts[i].setOnClickListener(new TextView.OnClickListener(){
+                public void onClick(View v){
+                   Double latitude =(double) ((TextView)v).getTag(R.string.tag_latitude);
+                    Double longitude = (double)((TextView)v).getTag(R.string.tag_longitude);
+                    int id = (int) ((TextView)v).getTag(R.string.tag_id);
+                    String name = (String) ((TextView)v).getTag(R.string.tag_name);
+                    Log.e("MainActPresenter","id: " + id +", lat: " + latitude + ", long: " +longitude + ", name: " + name  );
+                    view.getToolbarEditText().setText(name);
+                    pwindow.dismiss();
+                    view.getMapsPresenter().sendMapTo(latitude,longitude);
+                }
+            });
         }
 
 

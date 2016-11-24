@@ -40,6 +40,7 @@ public interface MapsContract {
     interface Presenter extends BasePresenter {
 
 
+        void sendMapTo(double lat, double longitude);
         void takeMap(GoogleMap gm);
         void initZoom();
         void initPoints();

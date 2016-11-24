@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 
 import com.unfairtools.campsites.base.BasePresenter;
 import com.unfairtools.campsites.base.BaseView;
+import com.unfairtools.campsites.presenters.MapsPresenter;
 
 /**
  * Created by brianroberts on 11/15/16.
@@ -19,6 +20,7 @@ public interface MainContract {
         public FrameLayout getToolbarFrameLayout();
         public AutoCompleteTextView getToolbarEditText();
         public Context getViewContext();
+        public MapsContract.Presenter getMapsPresenter();
 
 
     }
