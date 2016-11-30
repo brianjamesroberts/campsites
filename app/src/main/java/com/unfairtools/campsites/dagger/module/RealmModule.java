@@ -59,11 +59,11 @@ public class RealmModule {
                         @Override
                         public boolean verify(String s, SSLSession sslSession) {
                             Log.e("verify", s + " " + sslSession.toString());
-                            if (s.equals("158.69.207.153")) {
-                                Log.e("Trust", "Trust verified");
+                            if (s.equals("unfairtools.com")) {
+                                Log.e("Trust", "Trust verified: " + s);
                                 return true;
                             } else {
-                                Log.e("DENIED", "denied trust verifier");
+                                Log.e("DENIED", "denied trust verifier: " + s);
                                 return false;
                             }
                         }
@@ -72,7 +72,7 @@ public class RealmModule {
 
             Log.e("RealmModule", "New realm module");
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://158.69.207.153/campsites/api/")
+                    .baseUrl("https://unfairtools.com/campsites/api/")
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();

@@ -131,8 +131,13 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 inf.longEast = latLngBounds.northeast.longitude;
                 inf.latSouth = latLngBounds.southwest.latitude;
                 inf.longWest = latLngBounds.southwest.longitude;
+                Log.e("Json out",new Gson().toJson(inf));
                 Log.e("MapsPresenter", "apisvc: " + apiService.toString());
-                Call<InfoObject> call = apiService.postBoundsForMarkers(inf);
+                Call<InfoObject> call = apiService.postBoundsForMarkersGet(
+                        Double.toString(inf.latNorth),
+                        Double.toString(inf.longEast),
+                        Double.toString(inf.latSouth),
+                        Double.toString(inf.longWest));
                 Log.e("MapsPresenter","Requesting markers");
                 call.enqueue(new Callback<InfoObject>(){
                     @Override
