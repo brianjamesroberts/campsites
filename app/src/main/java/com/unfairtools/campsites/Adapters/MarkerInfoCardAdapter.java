@@ -19,15 +19,13 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
-import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
 import com.unfairtools.campsites.ui.LocationDetailsFragment;
 import com.unfairtools.campsites.util.InfoObject;
 import com.unfairtools.campsites.util.LoginManager;
 import com.unfairtools.campsites.util.MarkerInfoObject;
-import com.unfairtools.campsites.util.OnLoggedInCallback;
+import com.unfairtools.campsites.util.callbacks.OnLoggedInCallback;
 import com.unfairtools.campsites.util.SQLMethods;
 
 import javax.inject.Inject;

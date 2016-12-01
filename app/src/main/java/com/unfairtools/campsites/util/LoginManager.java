@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.unfairtools.campsites.base.BaseApplication;
+import com.unfairtools.campsites.util.callbacks.OnLoggedInCallback;
 
 import javax.inject.Inject;
 
