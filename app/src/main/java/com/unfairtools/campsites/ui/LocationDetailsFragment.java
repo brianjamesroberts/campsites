@@ -16,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.unfairtools.campsites.Adapters.ImageTilesAdapter;
 import com.unfairtools.campsites.Adapters.MarkerInfoCardAdapter;
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
@@ -53,6 +54,7 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
     public void takeInfo(MarkerInfoObject inf, InfoObject infoObject){
 
 
+
         ((MarkerInfoCardAdapter)recyclerView.getAdapter()).setData(inf,infoObject);
 
 
@@ -68,14 +70,10 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
 
     public void takePrelimInfo(InfoObject inf){
 
-        Log.e("ShowMDDF", "my id: "  + inf.ids[0]);
+      //Todo:Implement
 
 
     }
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -83,9 +81,7 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
         return (MainActivity)getActivity();
     }
 
-    public LocationDetailsFragment() {
-        // Required empty public constructor
-    }
+    public LocationDetailsFragment() {/*Required empty public constructor*/}
 
 
     public static LocationDetailsFragment newInstance(Integer id, String name,Integer type,double latPoint,double longPoint) {

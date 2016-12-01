@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -69,6 +70,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
 
     public void onBindViewHolder(final MarkerInfoCardAdapter.MarkerCardViewHolder viewHolder, int index){
 
+        //Log.e("Laying out", "LAYOUT INDEX: " + index);
 
         viewHolder.selfView.setVisibility(View.VISIBLE);
 
@@ -79,6 +81,8 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         viewHolder.buttonLayout.setVisibility(View.GONE);
         viewHolder.switchCompat.setVisibility(View.GONE);
         viewHolder.loginLayout.setVisibility(View.GONE);
+
+        viewHolder.tilesRecycler.setVisibility(View.GONE);
 
         viewHolder.loadingBar.setVisibility(View.GONE);
         MarkerCardViewHolder.ViewType enumIndex = MarkerCardViewHolder.ViewType.values()[index];
@@ -93,36 +97,44 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
             return;
         }
         if(enumIndex == MarkerCardViewHolder.ViewType.TYPE_DESCRIPTION) {
-            Log.e("DB IS ", db.toString() + ": info.idprimarykey: "+ info.id_primary_key );
+            //Log.e("DB IS ", db.toString() + ": info.idprimarykey: " + info.id_primary_key);
 
             boolean hasMarkerLocal = SQLMethods.existsRecord(SQLMethods.Constants.LOCATIONS_INFO_TABLE_NAME,
-                    SQLMethods.Constants.LocationsInfoTable.id_primary_key,info.id_primary_key + "",db);
-            Log.e("MarkerInfCardAdap","Making descrption visible");
+                    SQLMethods.Constants.LocationsInfoTable.id_primary_key, info.id_primary_key + "", db);
+            //Log.e("MarkerInfCardAdap", "Making descrption visible");
             viewHolder.description.setVisibility(View.VISIBLE);
             viewHolder.description.setText(info.description);
             viewHolder.switchCompat.setVisibility(View.VISIBLE);
-            if(hasMarkerLocal) {
+            if (hasMarkerLocal) {
                 viewHolder.switchCompat.setChecked(true);
-            }
-            else {
+            } else {
                 viewHolder.switchCompat.setChecked(false);
             }
-            viewHolder.switchCompat.setOnClickListener(new SwitchCompat.OnClickListener(){
+            viewHolder.switchCompat.setOnClickListener(new SwitchCompat.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SwitchCompat s = (SwitchCompat)view;
-                    if(s.isChecked()){
-                        SQLMethods.addLocationLocal(db,MarkerInfoCardAdapter.this.markerInfo);
-                        SQLMethods.addLocationInfoLocal(db,MarkerInfoCardAdapter.this.info);
+                    SwitchCompat s = (SwitchCompat) view;
+                    if (s.isChecked()) {
+                        SQLMethods.addLocationLocal(db, MarkerInfoCardAdapter.this.markerInfo);
+                        SQLMethods.addLocationInfoLocal(db, MarkerInfoCardAdapter.this.info);
                         MarkerInfoCardAdapter.this.locationDetailsFragment.refreshMap();
-                        Log.e("Adapter","Saving local " + info.id_primary_key);
-                    }else{
-                        SQLMethods.deleteLocationLocal(db,markerInfo.ids[0]);
+                        Log.e("Adapter", "Saving local " + info.id_primary_key);
+                    } else {
+                        SQLMethods.deleteLocationLocal(db, markerInfo.ids[0]);
                         MarkerInfoCardAdapter.this.locationDetailsFragment.refreshMap();
-                        Log.e("Adapter","Don't save local " + info.id_primary_key);
+                        Log.e("Adapter", "Don't save local " + info.id_primary_key);
                     }
                 }
             });
+        }else if(enumIndex== MarkerCardViewHolder.ViewType.TYPE_TILES) {
+
+            //Log.e("MarkerInfoCardAdap","enumIndex TYPE TILES");
+            viewHolder.tilesRecycler.setVisibility(View.VISIBLE);
+            if(viewHolder.tilesRecycler.getAdapter()==null){
+                //Log.e("ADAPTER", "ADAPTER WAS NULL!!!");
+                viewHolder.tilesRecycler.setAdapter(new ImageTilesAdapter());
+                ((ImageTilesAdapter)viewHolder.tilesRecycler.getAdapter()).setData(info);
+            }
         }else if(enumIndex== MarkerCardViewHolder.ViewType.TYPE_RATING_COMMENTS){
 
                     if(MarkerInfoCardAdapter.this.lm.isLoggedIn()){
@@ -136,8 +148,8 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
                                         new OnLoggedInCallback() {
                                             @Override
                                             public void onFinish() {
-                                                InfoObject inf = this.result;
-                                                Log.e("LoginManager", "Login received " + new Gson().toJson(inf));
+                                                String authKey =  SQLMethods.getLastAuthKey(db);
+                                                Log.e("LoginManager", "Login received " + authKey + " logged in?: " + lm.isLoggedIn());
                                                 notifyDataSetChanged();
                                             }
                                         });
@@ -163,7 +175,7 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(Intent.ACTION_VIEW);
-                    Log.e("MICAdapter","google_url: " + info.google_url);
+                    //Log.e("MICAdapter","google_url: " + info.google_url);
                     i.setData(Uri.parse(info.google_url));
                     context.startActivity(i);
 
@@ -174,9 +186,9 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
 
 
 
-    public void setInfo(MarkerInfoObject in){
-        this.info = in;
-    }
+//    public void setInfo(MarkerInfoObject in){
+//        this.info = in;
+//    }
 
 
     @Override
@@ -192,11 +204,13 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
                 .inflate(R.layout.marker_card_layout, parent, false);
 
         MarkerCardViewHolder dataObjectHolder = new MarkerCardViewHolder(view);
+
         return dataObjectHolder;
     }
 
     public static class MarkerCardViewHolder extends RecyclerView.ViewHolder{
 
+        RecyclerView tilesRecycler;
         SwitchCompat switchCompat;
         TextView description;
         RatingBar ratingBar;
@@ -216,7 +230,12 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         ProgressBar loadingBar;
 
         public MarkerCardViewHolder(View itemView) {
+
             super(itemView);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(itemView.getContext(),LinearLayoutManager.HORIZONTAL,false);
+
+            tilesRecycler = (RecyclerView)itemView.findViewById(R.id.tiles_recycler_view);;
+            tilesRecycler.setLayoutManager(layoutManager);
             loginLayout = (LinearLayout)itemView.findViewById(R.id.login_layout_card_layout);
             description = (TextView)itemView.findViewById(R.id.card_view_description_text);
             ratingBar = (RatingBar)itemView.findViewById(R.id.ratingBar);

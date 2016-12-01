@@ -6,6 +6,8 @@
     android:id ="@+id/card_view_parent">
 
 
+
+
     <android.support.v7.widget.SwitchCompat
         android:text="Save offline"
         android:layout_width="wrap_content"
@@ -22,6 +24,14 @@
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="4dp"
         card_view:cardUseCompatPadding="true">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_margin="2dp"
+            android:id="@+id/tiles_recycler_view"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
         <LinearLayout
             android:orientation="horizontal"

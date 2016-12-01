@@ -32,6 +32,7 @@ public interface ApiService {
     Call<MarkerInfoObject> postIdForMarkerInfo(@Body InfoObject info);
 
     @POST("postforsearchinfo")
+    @Deprecated
     Call<InfoObject> postForSearchResults(@Body InfoObject info);
 
 //    @POST ("loginauth")

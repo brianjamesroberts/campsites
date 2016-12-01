@@ -140,10 +140,9 @@ public class SQLMethods {
 
     }
 
-    public static void putLastAuthKey(SQLiteDatabase db, Integer key){
+    public static void putLastAuthKey(SQLiteDatabase db, String key){
         try {
             db.beginTransaction();
-                Log.e("SQLMethods","putLastAuthKey: value already existed");
                 ContentValues cv = new ContentValues();
                 cv.put(Constants.LoginTable.id_primary_key,0);
                 cv.put(Constants.LoginTable.key,key);
@@ -353,7 +352,7 @@ public class SQLMethods {
                             Constants.LOGIN_TABLE_NAME +
                             "("
                             + Constants.LoginTable.id_primary_key + " INTEGER PRIMARY KEY,"
-                            + Constants.LoginTable.key + " INTEGER"
+                            + Constants.LoginTable.key + " TEXT"
                             + ");");
 
             db.setTransactionSuccessful();

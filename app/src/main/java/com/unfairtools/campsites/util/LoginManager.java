@@ -39,19 +39,20 @@ public class LoginManager {
         //this.baseApplication = base;
         base.getServicesComponent().inject(this);
 
-        getStoredAuth();
+        printStoredAuth();
 
         if(!loggedIn())
             tryLogin();
-
-        newLogin("brian", "password1", new OnLoggedInCallback() {
-
-            @Override
-            public void onFinish() {
-                InfoObject inf = this.result;
-                Log.e("LoginManager", "Login received " + new Gson().toJson(inf));
-            }
-        });
+//
+//        newLogin("brian", "password", new OnLoggedInCallback() {
+//
+//            @Override
+//            public void onFinish() {
+//                String inf = LoginManager.this.authKey;
+//                Log.e("LoginManager", "Login received " + authKey);
+//                SQLMethods.putLastAuthKey(db,authKey);
+//            }
+//        });
 
 //        if(loggedIn)
 //            beginRefreshLogin();
@@ -96,6 +97,8 @@ public class LoginManager {
                                     LoginManager.this.username = username;
                                     LoginManager.this.password = password;
                                     LoginManager.this.loggedIn = true;
+                                    LoginManager.this.authKey = infResult.authKey;
+                                    SQLMethods.putLastAuthKey(db,infResult.authKey);
                                 }
                             }
                         }
@@ -125,13 +128,13 @@ public class LoginManager {
 
 
 
-    private void getStoredAuth(){
+    private void printStoredAuth(){
         authKey = SQLMethods.getLastAuthKey(db);
         Log.e("LoginManager","getAuth: " + authKey);
-        putLastAuthKey(55);
+        //putLastAuthKey("55");
     }
 
-    private void putLastAuthKey(Integer key){
+    private void putLastAuthKey(String key){
         SQLMethods.putLastAuthKey(db,key);
     }
 
