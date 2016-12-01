@@ -73,11 +73,11 @@ public class LoginManager {
         new Thread(){
             public void run(){
             Call<InfoObject> call = apiService.postLogin(username,password);
+            Log.e("LoginManager","newLogin called");
+            call.enqueue(new Callback<InfoObject>(){
 
-        Log.e("LoginManager","newLogin called");
-        call.enqueue(new Callback<InfoObject>(){
-            @Override
-            public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response){
+                @Override
+                public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response){
                     InfoObject infResult = new InfoObject();
                     try {
                         infResult.ids = new int[]{Constants.LOGIN_DENIED};
@@ -109,8 +109,7 @@ public class LoginManager {
                         infResult.name = e.toString();
                     }
                     cb.onFinish();
-
-            }
+                }
 
             @Override
             public void onFailure(Call<InfoObject> call, Throwable t) {
@@ -125,8 +124,6 @@ public class LoginManager {
         }.start();
 
     }
-
-
 
 
     private void printStoredAuth(){
