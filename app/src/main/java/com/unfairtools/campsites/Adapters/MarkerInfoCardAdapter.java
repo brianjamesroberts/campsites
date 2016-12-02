@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -230,7 +231,8 @@ public class MarkerInfoCardAdapter extends RecyclerView.Adapter<MarkerInfoCardAd
         public MarkerCardViewHolder(View itemView) {
 
             super(itemView);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(itemView.getContext(),LinearLayoutManager.HORIZONTAL,false);
+            GridLayoutManager layoutManager = new GridLayoutManager(itemView.getContext(),5);
+//            LinearLayoutManager layoutManager = new LinearLayoutManager(itemView.getContext(),LinearLayoutManager.HORIZONTAL,false);
 
             tilesRecycler = (RecyclerView)itemView.findViewById(R.id.tiles_recycler_view);;
             tilesRecycler.setLayoutManager(layoutManager);

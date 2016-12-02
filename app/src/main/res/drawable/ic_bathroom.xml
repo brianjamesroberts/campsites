@@ -1,0 +1,8 @@
+<vector android:height="24dp" android:viewportHeight="572.0"
+    android:viewportWidth="620.0" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/tileUnselected" android:pathData="M131,46.6m-46.5,0a46.5,46.5 0,1 1,93.1 0a46.5,46.5 0,1 1,-93.1 0"/>
+    <path android:fillColor="@color/tileUnselected" android:pathData="M124.5,388.2V550C124.3,579.4 80.5,579.4 80.1,550V388.2H22.8L84.4,171.9H74.4L38.6,295.1C29.5,322.3 -7.3,311.3 1.3,282.2L41.4,149C46.1,133.7 65.3,106.7 98.7,106H128.8H163.2C195.6,106.7 215,133.9 220.5,149L260.6,282.2C268.7,311.1 232.2,323 223.3,295.1L187.5,171.9H176.1L239.1,388.2H180.4V550C180.8,579.4 137.2,579.2 137.4,550V388.2H124.5z"/>
+    <path android:fillColor="@color/tileUnselected" android:pathData="M511.9,46.6m-46.5,0a46.5,46.5 0,1 1,93.1 0a46.5,46.5 0,1 1,-93.1 0"/>
+    <path android:fillColor="@color/tileUnselected" android:pathData="M462.5,106C426.7,106 403.8,137 403.8,167.6V310.8C403.4,338.8 443.7,338.8 443.9,310.8V179.1H453.9V542.8C453.3,580.8 507,579.7 506.9,542.8V330.9H515.5V542.8C516.2,579.7 570.1,580.8 569.9,542.8V179.1H579.9V310.8C579.5,339 619.5,339 620,310.8V167.6C619.5,137 595.7,106.6 559.9,106H462.5z"/>
+    <path android:fillColor="@color/tileUnselected" android:pathData="M297.8,5.8h53v562.8h-53z"/>
+</vector>

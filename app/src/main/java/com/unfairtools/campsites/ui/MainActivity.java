@@ -107,9 +107,11 @@ public class MainActivity extends AppCompatActivity
                 Log.e("MainActivity", "Replacing map fragment with markerInfoFragment");
                 FragmentManager fm = getSupportFragmentManager();
                 Fragment locationDetailsFragment = fm.findFragmentByTag("marker_info_fragment");
-                if (locationDetailsFragment == null) {
-                    locationDetailsFragment = LocationDetailsFragment.newInstance(id,name,type,latPoint,longPoint);
-                }
+//                if (locationDetailsFragment == null) {
+//                    locationDetailsFragment = LocationDetailsFragment.newInstance(id,name,type,latPoint,longPoint);
+//                }
+
+                locationDetailsFragment = LocationDetailsFragment.newInstance(id,name,type,latPoint,longPoint);
 
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
