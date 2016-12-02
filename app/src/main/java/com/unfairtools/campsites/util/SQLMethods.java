@@ -179,7 +179,7 @@ public class SQLMethods {
     public static ArrayList<MarkerOptionsTuple>  getMarkers(SQLiteDatabase db, LatLngBounds latLngBounds){
         ArrayList<MarkerOptionsTuple> returnMarkers = new ArrayList<MarkerOptionsTuple>();
 
-        Log.e("SQLMETHODS", "latLngBounds.southewest: " + latLngBounds.southwest.toString());
+//        Log.e("SQLMETHODS", "latLngBounds.southewest: " + latLngBounds.southwest.toString());
 
         Cursor resultSet = db.rawQuery("Select * from " + Constants.LOCATIONS_TABLE_NAME//,null);
 
@@ -192,7 +192,7 @@ public class SQLMethods {
         if(resultSet==null)
             return returnMarkers;
 
-        Log.e("SQLMethods", "resultset size: " + resultSet.getCount());
+//        Log.e("SQLMethods", "resultset size: " + resultSet.getCount());
 
         for (int i = 0; i < (resultSet.getCount()) && !resultSet.isAfterLast(); i++) {
             if (i == 0)

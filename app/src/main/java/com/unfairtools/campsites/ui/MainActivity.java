@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +21,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.unfairtools.campsites.R;
 import com.unfairtools.campsites.base.BaseApplication;
@@ -53,6 +58,27 @@ public class MainActivity extends AppCompatActivity
             private ActionBarDrawerToggle toggle;
             private DrawerLayout drawer;
             private String searchBarText = new String();
+
+
+            public ImageButton getClearTextButton(){
+                return (ImageButton)findViewById(R.id.toolbar_x_button);
+            }
+
+            public void hideKeyboard(){
+                View view = this.getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+
+            public RecyclerView getToolbarRecyclerView(){
+                return (RecyclerView)findViewById(R.id.toolbar_recycler_view_tiles);
+            }
+
+            public TextView getToolbarDisplayOnlyEditText(){
+                return (TextView)findViewById(R.id.toolbar_display_only_text);
+            }
 
 
             public AutoCompleteTextView getToolbarEditText(){
@@ -94,8 +120,10 @@ public class MainActivity extends AppCompatActivity
                 ft.commit();
 
                 searchBarText = ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).getText().toString();
+                ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).setTag("0");
                 ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).setText(name);
                 ((AutoCompleteTextView)findViewById(R.id.main_search_bar)).setEnabled(false);
+                getClearTextButton().setVisibility(View.GONE);
 
 
 
@@ -184,9 +212,21 @@ public class MainActivity extends AppCompatActivity
 
         View mCustomView = mInflater.inflate(R.layout.actionbar_searchfield, null);
 
+
         toolbar.addView(mCustomView);
 
         setSupportActionBar(toolbar);
+
+        toolbar.findViewById(R.id.toolbar_display_only_text).setVisibility(View.GONE);
+        toolbar.findViewById(R.id.toolbar_recycler_view_tiles).setVisibility(View.GONE);
+        toolbar.findViewById(R.id.toolbar_x_button).setBackgroundResource(R.drawable.ic_close_black);
+        toolbar.findViewById(R.id.toolbar_x_button).setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                MainActivity.this.getToolbarEditText().setText("");
+            }
+        });
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 

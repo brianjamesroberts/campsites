@@ -27,6 +27,7 @@ public interface MapsContract {
         MainActivity getMainActivity();
 
         FragmentManager getFragmentManager2();
+
     }
 
     interface MarkerInfoView extends BaseView<MarkerInfoPresenter> {
@@ -34,7 +35,6 @@ public interface MapsContract {
     }
 
     interface MarkerInfoPresenter extends BasePresenter {
-
     }
 
     interface Presenter extends BasePresenter {
@@ -45,6 +45,8 @@ public interface MapsContract {
         void initZoom();
         void initPoints();
         void showInfo(SupportMapFragment mapFragment);
+        boolean showMarkerTag(int id);
+        void setShowTagId(int id);
 
 
 //        void addNewCard(ScannedCode code);

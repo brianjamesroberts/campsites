@@ -30,6 +30,7 @@ import com.unfairtools.campsites.util.SQLMethods;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -59,6 +60,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     BitmapDescriptor icon;
 
+    private volatile int showId = -1;
+
     public MapsPresenter(MapsContract.View v, BaseApplication b){
         view = v;
         baseApp = b;
@@ -70,7 +73,6 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
     public void sendMapTo(double lat, double longitude){
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, longitude), 9.0f));
-
     }
 
     public void initZoom(){
@@ -81,6 +83,19 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
     private HashMap<MarkerOptions, Integer> markerOptionsHashMap;
     private HashMap<MarkerOptions, Integer> markerOptionsHashMapLocal;
     private HashMap<Marker, Integer> markerHashMap;
+    private HashMap<Integer, Marker> intToMarkerHashMap;
+
+
+    public boolean showMarkerTag(int id){
+        try {
+            intToMarkerHashMap.get(id).showInfoWindow();
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 
     public boolean onMarkerClick(Marker m){
         m.showInfoWindow();
@@ -110,7 +125,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
         for(SQLMethods.MarkerOptionsTuple mo: localSaves){
             mo.marker.icon(icon);
-            Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
+            //Log.e("MapsPresenter", "loading from local: " + mo.marker.getTitle());
             markerOptionsHashMapLocal.put(mo.marker,mo.id);
         }
         placeMarkersOnMap(googleMap, null);
@@ -131,8 +146,8 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                 inf.longEast = latLngBounds.northeast.longitude;
                 inf.latSouth = latLngBounds.southwest.latitude;
                 inf.longWest = latLngBounds.southwest.longitude;
-                Log.e("Json out",new Gson().toJson(inf));
-                Log.e("MapsPresenter", "apisvc: " + apiService.toString());
+                //Log.e("Json out",new Gson().toJson(inf));
+                //Log.e("MapsPresenter", "apisvc: " + apiService.toString());
                 Call<InfoObject> call = apiService.postBoundsForMarkersGet(
                         Double.toString(inf.latNorth),
                         Double.toString(inf.longEast),
@@ -143,16 +158,12 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
                     @Override
                     public void onResponse(Call<InfoObject> call, retrofit2.Response<InfoObject> response) {
                         try {
-                            Log.e("MapsPresenter", "Response received");
                             Gson gson = new Gson();
                             String json = gson.toJson(response.body());
-                            Log.e("MapsPresenter","json: " + json);
                             if(response.isSuccessful()) {
                                 InfoObject inf = response.body();
                                 System.out.println(inf.names);
-                                if(response.body().names!=null) {
-                                    placeMarkersOnMap(googleMap, response.body());
-                                }
+                                placeMarkersOnMap(googleMap, response.body());
                             }
 //                    readTSLInfo(new JSONObject(response.body().toJSon()));
                         }catch (Exception e){
@@ -191,14 +202,36 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         Set<MarkerOptions> localMarkers =  markerOptionsHashMapLocal.keySet();
         Set<MarkerOptions> iMarkers = markerOptionsHashMap.keySet();
 
-        googleMap.clear();
-        for(MarkerOptions m : localMarkers){
-            markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMapLocal.get(m));
+        if(inf==null) {
+            for (MarkerOptions m : localMarkers) {
+                Marker a = googleMap.addMarker(m);
+                markerHashMap.put(a, markerOptionsHashMapLocal.get(m));
+                intToMarkerHashMap.put(markerOptionsHashMapLocal.get(m), a);
+            }
         }
 
-        for(MarkerOptions m: iMarkers){
-            markerHashMap.put(googleMap.addMarker(m),markerOptionsHashMap.get(m));
+        if(inf!=null) {
+
+            for (MarkerOptions m : iMarkers) {
+                Marker a = googleMap.addMarker(m);
+                markerHashMap.put(a, markerOptionsHashMap.get(m));
+                intToMarkerHashMap.put(markerOptionsHashMap.get(m), a);
+            }
         }
+
+        Log.e("MapsPresenter", "Attempting to show tag " + showId);
+        if(showId!=-1){
+            //the hackiness is l33t!!!!
+            if(((SQLMethods.getMarkerInfoLocal(showId,db)!=null) && inf==null) ||(SQLMethods.getMarkerInfoLocal(showId,db)==null && inf!=null)) {
+                if (showMarkerTag(showId)) {
+                    showId = -1;
+                }
+            }
+        }
+    }
+
+    public void setShowTagId(int id){
+        showId=id;
     }
 
 
@@ -260,24 +293,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         gm.moveCamera(CameraUpdateFactory.newLatLngZoom(lat2,zoom));
 
 
-        gm.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition location) {
 
-//                SQLMethods.setMapPrefs(db,googleMap.getCameraPosition().target, googleMap.getCameraPosition().zoom);
-//
-//
-//                //markerHashMap.clear();
-//
-//
-//                googleMap.clear();
-//
-//
-//
-//                loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
-//                loadMarkers(googleMap.getProjection().getVisibleRegion().latLngBounds);
-            }
-        });
     }
 
 
@@ -285,12 +301,12 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         googleMap.clear();
         markerOptionsHashMap.clear();
         markerOptionsHashMapLocal.clear();
+        intToMarkerHashMap.clear();
         initPoints();
     }
 
 
     public void initPoints(){
-        Log.e("MapsPresenter", "Init points!");
         markerHashMap.clear();
         googleMap.clear();
         loadMarkersLocal(googleMap.getProjection().getVisibleRegion().latLngBounds);
@@ -308,6 +324,7 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
         markerHashMap = new HashMap<Marker,Integer>();
         markerOptionsHashMap = new HashMap<MarkerOptions, Integer>();
         markerOptionsHashMapLocal = new HashMap<MarkerOptions, Integer>();
+        intToMarkerHashMap = new HashMap<Integer, Marker>();
 
     }
 

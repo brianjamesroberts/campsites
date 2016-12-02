@@ -47,4 +47,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     apt 'com.google.dagger:dagger-compiler:2.7'
 
+    compile 'com.android.support:recyclerview-v7:25.0.0'
 }

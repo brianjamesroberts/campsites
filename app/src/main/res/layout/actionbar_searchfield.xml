@@ -4,14 +4,55 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <AutoCompleteTextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textSize="14sp"
-        android:textColor="#212121"
-        android:id="@+id/main_search_bar"
-        android:inputType="text|textNoSuggestions"
-        />
+        android:orientation="horizontal"
+        android:id="@+id/toolbar_top_layout">
+
+        <AutoCompleteTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textSize="14sp"
+            android:textColor="#212121"
+            android:id="@+id/main_search_bar"
+            android:inputType="text|textNoSuggestions"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+
+            />
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:textSize="14sp"
+            android:textColor="#212121"
+            android:id="@+id/toolbar_display_only_text"
+            android:visibility="gone"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:id="@+id/toolbar_x_button"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/toolbar_recycler_view_tiles"
+        android:layout_below="@id/toolbar_top_layout"
+        android:visibility="gone"/>
 
 </RelativeLayout>

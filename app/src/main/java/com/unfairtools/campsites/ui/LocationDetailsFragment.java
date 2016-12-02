@@ -194,8 +194,9 @@ public class LocationDetailsFragment extends Fragment implements MarkerInfoContr
         getMainActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getMainActivity().getSupportActionBar().setHomeButtonEnabled(false);
         getMainActivity().getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
-        ((AutoCompleteTextView)getMainActivity().findViewById(R.id.main_search_bar)).setText("");
         ((AutoCompleteTextView)getMainActivity().findViewById(R.id.main_search_bar)).setEnabled(true);
+        ((AutoCompleteTextView)getMainActivity().findViewById(R.id.main_search_bar)).setText("");
+//        getMainActivity().getClearTextButton().setVisibility(View.VISIBLE);
         //getMainActivity().presenter.animateToolbarMargin(MainActivity.ToolbarMargin);
         getMainActivity().setToggleHamburgerVisibility(true);
         Log.e("LocationDetailsFrag", "onDetach called");

@@ -81,12 +81,9 @@ public class LoginManager {
                     InfoObject infResult = new InfoObject();
                     try {
                         infResult.ids = new int[]{Constants.LOGIN_DENIED};
+                        infResult.name = "OnResponse: Success, but didn't parse json properly!";
+
                         Log.e("Incmoing json login: ", new Gson().toJson(response.body()));
-                        infResult.name = "OnResponse: Success, didn't parse json properly!";
-                        Log.e("MapsPresenter", "Response received");
-                        Gson gson = new Gson();
-                        String json = gson.toJson(response.body());
-                        Log.e("MapsPresenter", "json: " + json);
                         if (response.isSuccessful()) {
                             InfoObject inf = response.body();
                             System.out.println(inf.names);

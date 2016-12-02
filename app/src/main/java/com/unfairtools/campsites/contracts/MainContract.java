@@ -1,9 +1,13 @@
 package com.unfairtools.campsites.contracts;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.unfairtools.campsites.base.BasePresenter;
 import com.unfairtools.campsites.base.BaseView;
@@ -21,6 +25,10 @@ public interface MainContract {
         public AutoCompleteTextView getToolbarEditText();
         public Context getViewContext();
         public MapsContract.Presenter getMapsPresenter();
+        public void hideKeyboard();
+        public ImageButton getClearTextButton();
+        public RecyclerView getToolbarRecyclerView();
+        public TextView getToolbarDisplayOnlyEditText();
 
 
     }

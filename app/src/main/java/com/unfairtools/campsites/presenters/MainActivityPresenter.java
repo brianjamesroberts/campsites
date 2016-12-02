@@ -92,6 +92,7 @@ public class MainActivityPresenter implements MainContract.Presenter {
     public void notifyViewIsReady(){
         autoCompleteTextView = this.view.getToolbarEditText();
 
+
         autoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -101,10 +102,30 @@ public class MainActivityPresenter implements MainContract.Presenter {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 Log.e("Text is", charSequence.toString());
+
+                if(view.getToolbarEditText().isEnabled() && charSequence.length()>0){
+                    view.getClearTextButton().setVisibility(View.VISIBLE);
+                }else{
+                    view.getClearTextButton().setVisibility(View.GONE);
+                }
+                if(charSequence.length()>0 && view.getToolbarEditText().isEnabled()){
+                    view.getClearTextButton().setVisibility(View.VISIBLE);
+                    view.getClearTextButton().invalidate();
+                }else{
+                    view.getClearTextButton().setVisibility(View.GONE);
+                    view.getClearTextButton().invalidate();
+                }
+
                 if(charSequence.length()<2) {
                     if(pwindow!=null && pwindow.isShowing()) {
                         pwindow.dismiss();
                     }
+                    return;
+                }
+                Object tag = MainActivityPresenter.this.view.getToolbarEditText().getTag();
+                if(tag!=null && tag.equals("0")){
+                    Log.e("TAG","Tag was " + tag.toString() );
+                    MainActivityPresenter.this.view.getToolbarEditText().setTag("1");
                     return;
                 }
                 final InfoObject infoObjectInput = new InfoObject();
@@ -161,15 +182,7 @@ public class MainActivityPresenter implements MainContract.Presenter {
         if(infoObjectInput==null ||infoObjectInput.names==null || infoObjectInput.names.length==0)
             return;
 
-//        ArrayList<String> inputAsList = new ArrayList<String>();
-//        Log.e("inf", "Input length of infoObjectInput:" + infoObjectInput.names.length);
-//        for(int i = 0; i < infoObjectInput.names.length; i ++){
-//            Log.e("Adding", infoObjectInput.names[i] + "");
-//            if(infoObjectInput.names[i]!=null)
-//                inputAsList.add(infoObjectInput.names[i]);
-//        }
-//        if(inputAsList.size()==0)
-//            inputAsList.add(new String());
+
 
 
         ArrayList<InfoObject> results = new ArrayList<InfoObject>();
@@ -235,9 +248,14 @@ public class MainActivityPresenter implements MainContract.Presenter {
                     int id = (int) ((TextView)v).getTag(R.string.tag_id);
                     String name = (String) ((TextView)v).getTag(R.string.tag_name);
                     Log.e("MainActPresenter","id: " + id +", lat: " + latitude + ", long: " +longitude + ", name: " + name  );
+                    view.getToolbarEditText().setTag("0");
                     view.getToolbarEditText().setText(name);
+                    view.getToolbarEditText().clearFocus();
+                    view.hideKeyboard();
                     pwindow.dismiss();
+                    view.getMapsPresenter().setShowTagId(id);
                     view.getMapsPresenter().sendMapTo(latitude,longitude);
+
                 }
             });
         }
