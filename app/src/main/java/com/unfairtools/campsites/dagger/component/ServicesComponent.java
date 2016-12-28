@@ -10,8 +10,6 @@ import com.unfairtools.campsites.presenters.MarkerInfoFragmentPresenter;
 import com.unfairtools.campsites.util.LoginManager;
 
 import dagger.Component;
-
-
 import javax.inject.Singleton;
 
 @Component(modules = {
@@ -27,6 +25,4 @@ public interface ServicesComponent {
     void inject(MarkerInfoFragmentPresenter presenter);
     void inject(MarkerInfoCardAdapter adapter);
     void inject(LoginManager loginManager);
-
-
 }

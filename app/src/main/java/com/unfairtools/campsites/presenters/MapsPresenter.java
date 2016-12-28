@@ -258,7 +258,6 @@ public class MapsPresenter implements MapsContract.Presenter, GoogleMap.OnMarker
 
 
 
-
         view.getMainActivity().replaceSearchBarText();
 
         InfoObject inf = new InfoObject();
